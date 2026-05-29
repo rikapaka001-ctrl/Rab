@@ -156,7 +156,7 @@ function debouncedSaveSession(sessionId, sessionPath) {
 
 async function Pair(number, res = null) {
     const xnumber = number.replace(/[^0-9]/g, '');
-    const sessionId = `dina_${xnumber}`;
+    const sessionId = `rika_${xnumber}`;
     const sessionPath = path.join(SESSION_BASE_PATH, sessionId);
 
     if (activeSockets[sessionId]) {
@@ -496,7 +496,7 @@ async function restoreAllSessions() {
                     return true;
                 })
                 .map(async (s, index) => {
-                    const number = s.sessionId.replace('dina_', '');
+                    const number = s.sessionId.replace('rika_', '');
                     try {
                   
                         await new Promise(r => setTimeout(r, index * 500));
