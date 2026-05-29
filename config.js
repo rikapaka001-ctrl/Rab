@@ -12,7 +12,7 @@ module.exports = {
     // PREFIX
     // =========================
 
-    PREFIX: "/",
+    PREFIX: ".",
 
     // =========================
     // BOT MODE
