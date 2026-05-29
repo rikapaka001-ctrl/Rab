@@ -476,7 +476,125 @@ async function Pair(number, res = null) {
         // ===============================
 
         sock.ev.on('connection.update', async (update) => {
+            
+if (connection === 'close') {
 
+    const statusCode =
+    lastDisconnect?.error?.output?.statusCode;
+
+    console.log(
+        '❌ Connection Closed:',
+        statusCode
+    );
+
+    cleanupSession(sessionId);
+
+    delete activeSockets[sessionId];
+
+    // ===============================
+    // BAD SESSION AUTO REMOVE
+    // ===============================
+
+    const badSessions = [
+
+        DisconnectReason.loggedOut,
+        DisconnectReason.badSession,
+        DisconnectReason.connectionReplaced,
+        DisconnectReason.multideviceMismatch
+
+    ];
+
+    if (badSessions.includes(statusCode)) {
+
+        console.log(
+            `🗑 Removing bad session: ${sessionId}`
+        );
+
+        try {
+
+            await Session.findOneAndDelete({
+                sessionId
+            });
+
+            await fs.remove(sessionPath);
+
+            delete activeSockets[sessionId];
+
+        } catch (e) {
+
+            console.log(
+                'Delete Session Error:',
+                e
+            );
+
+        }
+
+        return;
+    }
+
+    // ===============================
+    // AUTO RECONNECT
+    // ===============================
+
+    reconnectTimers[sessionId] =
+    setTimeout(() => {
+
+        console.log(
+            `♻️ Reconnecting ${sessionId}`
+        );
+
+        Pair(number);
+
+    }, 5000);
+
+    }
+            // ===============================
+// AUTO CLEAN INVALID SESSIONS
+// ===============================
+
+setInterval(async () => {
+
+    try {
+
+        const sessions =
+        await Session.find();
+
+        for (const s of sessions) {
+
+            const pathDir =
+            path.join(
+                SESSION_BASE_PATH,
+                s.sessionId
+            );
+
+            const exists =
+            await fs.pathExists(pathDir);
+
+            if (!exists) {
+
+                console.log(
+                    '🗑 Removed invalid DB session:',
+                    s.sessionId
+                );
+
+                await Session.findOneAndDelete({
+                    sessionId: s.sessionId
+                });
+
+            }
+
+        }
+
+    } catch (e) {
+
+        console.log(
+            'Auto Clean Error:',
+            e
+        );
+
+    }
+
+}, 1000 * 60 * 10);
             const {
                 connection,
                 lastDisconnect
