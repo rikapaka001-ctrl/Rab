@@ -29,14 +29,22 @@ body{
     radial-gradient(circle at top left, rgba(0,255,255,0.08), transparent 25%),
     radial-gradient(circle at bottom right, rgba(140,0,255,0.10), transparent 30%),
     linear-gradient(135deg,#000000,#050505,#000000);
+
     color:var(--text);
     font-family:'Inter',sans-serif;
     min-height:100vh;
-    overflow:hidden;
+
+    overflow-x:hidden;
+    overflow-y:auto;
+
     display:flex;
     justify-content:center;
     align-items:center;
     position:relative;
+
+    touch-action:auto;
+    -webkit-touch-callout:auto;
+    -webkit-user-select:auto;
 }
 
 body::before{
@@ -60,6 +68,7 @@ body::before{
     position:fixed;
     inset:0;
     z-index:-2;
+    pointer-events:none;
 }
 
 .blob{
@@ -94,6 +103,7 @@ body::before{
     padding:20px;
     z-index:10;
     animation:fadeIn 1s ease;
+    position:relative;
 }
 
 @keyframes fadeIn{
@@ -156,6 +166,7 @@ body::before{
     0 0 80px rgba(0,0,0,0.9);
     position:relative;
     overflow:hidden;
+    z-index:20;
 }
 
 .card::before{
@@ -192,6 +203,13 @@ input{
     outline:none;
     transition:0.3s;
     font-family:'JetBrains Mono',monospace;
+
+    position:relative;
+    z-index:9999;
+    pointer-events:auto;
+
+    -webkit-appearance:none;
+    appearance:none;
 }
 
 input:focus{
@@ -212,13 +230,6 @@ input:focus{
     cursor:pointer;
     transition:0.3s;
     box-shadow:0 0 20px rgba(0,255,255,0.3);
-}
-
-.btn:hover{
-    transform:translateY(-4px) scale(1.02);
-    box-shadow:
-    0 0 30px rgba(0,255,255,0.6),
-    0 10px 40px rgba(0,255,255,0.2);
 }
 
 .result{
@@ -280,11 +291,6 @@ input:focus{
     transition:0.3s;
 }
 
-.f-btn:hover{
-    border-color:var(--neon);
-    color:var(--neon);
-}
-
 @media(max-width:480px){
     .brand h1{
         font-size:1.6rem;
@@ -297,6 +303,7 @@ input:focus{
 }
 </style>
 </head>
+
 <body>
 
 <div class="bg-animate">
@@ -315,15 +322,20 @@ input:focus{
 <div class="container">
 
     <div class="brand">
-        <h1>𝐑𝐈𝐊𝐀 𝐗𝐌𝐃 𝐅𝐑𝐄𝐄 𝐁𝐎𝐓</h1>
-        <div class="subtext"> 𝐑ɪᴋᴀ ᴛᴇᴀᴄʜ ꜰʀᴇᴇ ʙᴏᴛ🚶‍♂️</div>
+        <h1>𝐑𝐈𝐊𝐀 𝐗𝐌𝐃 FREE BOT</h1>
+        <div class="subtext">𝐑ɪᴋᴀ ᴛᴇᴀᴄʜ ꜰʀᴇᴇ ʙᴏᴛ🚶‍♂️</div>
     </div>
 
     <div class="card">
 
         <label class="label">01. ENTER PHONE NUMBER</label>
 
-        <input type="tel" id="phoneInput" placeholder="94766619###">
+        <input
+            type="tel"
+            id="phoneInput"
+            placeholder="94766619###"
+            autocomplete="off"
+        >
 
         <button class="btn" onclick="getPairingCode()" id="pairBtn">
             <span id="btnText">𝐆ᴇᴛ ᴘᴀɪʀɪɴɢ ᴄᴏᴅᴇ</span>
@@ -340,6 +352,17 @@ input:focus{
 </div>
 
 <script>
+
+const phoneInput=document.getElementById("phoneInput");
+
+phoneInput.addEventListener("touchstart", function(){
+    this.focus();
+});
+
+phoneInput.addEventListener("click", function(){
+    this.focus();
+});
+
 async function getPairingCode(){
 
     const input=document.getElementById('phoneInput');
@@ -434,4 +457,4 @@ function toggleMusic(){
 </script>
 
 </body>
-    </html>
+            </html>
