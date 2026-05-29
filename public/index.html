@@ -1,318 +1,278 @@
 <!DOCTYPE html>
 <html lang="si">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RIKA XMD FREE BOT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIKA FREE BOT</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --surface: #0d0d0d;
+            --border: #1a1a1a;
+            --neon: #00f2ff; /* Cyan Neon */
+            --neon-glow: rgba(0, 242, 255, 0.5);
+            --text: #ffffff;
+            --muted: #888888;
+            --error: #ff3e3e;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+        body.light-mode {
+            --bg: #ffffff;
+            --surface: #f5f5f5;
+            --border: #dddddd;
+            --neon: #000000;
+            --neon-glow: rgba(0, 0, 0, 0.2);
+            --text: #000000;
+            --muted: #666666;
+        }
 
-<style>
-:root{
-    --bg:#020202;
-    --surface:rgba(10,10,10,0.7);
-    --border:rgba(0,255,255,0.12);
-    --neon:#00f2ff;
-    --purple:#8c00ff;
-    --text:#ffffff;
-    --muted:#8a8a8a;
-}
+        * {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+        }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
 
-body{
-    background:
-    radial-gradient(circle at top left, rgba(0,255,255,0.08), transparent 25%),
-    radial-gradient(circle at bottom right, rgba(140,0,255,0.10), transparent 30%),
-    linear-gradient(135deg,#000000,#050505,#000000);
+        
+        .bg-animate {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+            overflow: hidden;
+        }
+        
+        .blob {
+            position: absolute;
+            width: 300px; height: 300px;
+            background: var(--neon);
+            filter: blur(80px);
+            border-radius: 50%;
+            opacity: 0.05;
+            animation: move 20s infinite alternate;
+        }
 
-    color:var(--text);
-    font-family:'Inter',sans-serif;
-    min-height:100vh;
+        @keyframes move {
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(110%, 110%); }
+        }
 
-    overflow-x:hidden;
-    overflow-y:auto;
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+            animation: fadeInScale 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    position:relative;
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
 
-    touch-action:auto;
-    -webkit-touch-callout:auto;
-    -webkit-user-select:auto;
-}
+        .brand {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    background-image:
-    linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px);
-    background-size:40px 40px;
-    animation:gridMove 15s linear infinite;
-    z-index:-3;
-}
+        .brand h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: var(--neon);
+            text-shadow: 0 0 15px var(--neon-glow);
+            /* --- Animation 3: Text Flicker --- */
+            animation: flicker 3s infinite;
+        }
 
-@keyframes gridMove{
-    from{transform:translateY(0px);}
-    to{transform:translateY(40px);}
-}
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% { text-shadow: 0 0 15px var(--neon-glow); }
+            20%, 24%, 55% { text-shadow: none; opacity: 0.8; }
+        }
 
-.bg-animate{
-    position:fixed;
-    inset:0;
-    z-index:-2;
-    pointer-events:none;
-}
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 40px 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transition: all 0.4s ease;
+        }
 
-.blob{
-    position:absolute;
-    width:450px;
-    height:450px;
-    border-radius:50%;
-    background:radial-gradient(circle, rgba(0,255,255,0.22), transparent 70%);
-    filter:blur(90px);
-    animation:floatBlob 18s infinite alternate ease-in-out;
-}
+        
+        .card:focus-within {
+            border-color: var(--neon);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
+        }
 
-.blob:nth-child(2){
-    background:radial-gradient(circle, rgba(140,0,255,0.22), transparent 70%);
-    top:50%;
-    left:60%;
-    animation-duration:24s;
-}
+        .label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--neon);
+            margin-bottom: 20px;
+            display: block;
+            letter-spacing: 1px;
+        }
 
-@keyframes floatBlob{
-    from{
-        transform:translate(-10%,-10%) scale(1);
-    }
-    to{
-        transform:translate(20%,20%) scale(1.3);
-    }
-}
+        .input-wrapper {
+            margin-bottom: 25px;
+            position: relative;
+        }
 
-.container{
-    width:100%;
-    max-width:420px;
-    padding:20px;
-    z-index:10;
-    animation:fadeIn 1s ease;
-    position:relative;
-}
+        input[type="tel"] {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            padding: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
 
-@keyframes fadeIn{
-    from{
-        opacity:0;
-        transform:translateY(20px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
+        input[type="tel"]:focus {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--neon);
+        }
 
-.brand{
-    text-align:center;
-    margin-bottom:35px;
-}
+        
+        .btn {
+            width: 100%;
+            background: var(--neon);
+            color: #000;
+            border: none;
+            padding: 18px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
 
-.brand h1{
-    font-family:'JetBrains Mono',monospace;
-    font-size:2.1rem;
-    letter-spacing:7px;
-    color:var(--neon);
-    text-shadow:
-    0 0 10px rgba(0,255,255,0.8),
-    0 0 25px rgba(0,255,255,0.5),
-    0 0 50px rgba(0,255,255,0.3);
-    animation:glowPulse 2s infinite alternate;
-}
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px var(--neon-glow);
+            filter: brightness(1.1);
+        }
 
-@keyframes glowPulse{
-    from{
-        text-shadow:
-        0 0 10px rgba(0,255,255,0.7),
-        0 0 20px rgba(0,255,255,0.4);
-    }
-    to{
-        text-shadow:
-        0 0 20px rgba(0,255,255,1),
-        0 0 40px rgba(0,255,255,0.8),
-        0 0 80px rgba(0,255,255,0.4);
-    }
-}
+        .btn:active { transform: translateY(0); }
 
-.subtext{
-    margin-top:12px;
-    font-size:0.7rem;
-    letter-spacing:4px;
-    color:var(--muted);
-}
+        .loader {
+            width: 18px; height: 18px;
+            border: 3px solid #000;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
 
-.card{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:24px;
-    padding:35px 28px;
-    backdrop-filter:blur(20px);
-    box-shadow:
-    0 0 30px rgba(0,255,255,0.08),
-    0 0 80px rgba(0,0,0,0.9);
-    position:relative;
-    overflow:hidden;
-    z-index:20;
-}
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-.card::before{
-    content:"";
-    position:absolute;
-    inset:-1px;
-    border-radius:24px;
-    padding:1px;
-    background:linear-gradient(135deg, rgba(0,255,255,0.5), rgba(140,0,255,0.3), transparent);
-    -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-    -webkit-mask-composite:xor;
-    mask-composite:exclude;
-}
+        .result {
+            margin-top: 25px;
+            display: none;
+        }
 
-.label{
-    display:block;
-    margin-bottom:18px;
-    color:var(--neon);
-    font-family:'JetBrains Mono',monospace;
-    font-size:0.8rem;
-    letter-spacing:2px;
-}
+        .result.show { 
+            display: block; 
+            animation: slideIn 0.5s ease forwards;
+        }
 
-input{
-    width:100%;
-    background:rgba(255,255,255,0.03);
-    border:1px solid rgba(0,255,255,0.1);
-    border-radius:14px;
-    padding:18px;
-    color:#fff;
-    font-size:1.1rem;
-    outline:none;
-    transition:0.3s;
-    font-family:'JetBrains Mono',monospace;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    position:relative;
-    z-index:9999;
-    pointer-events:auto;
+        .code-display {
+            background: rgba(0, 242, 255, 0.05);
+            border: 1px dashed var(--neon);
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+        }
 
-    -webkit-appearance:none;
-    appearance:none;
-}
+        .code-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 10px;
+            color: var(--neon);
+            text-shadow: 0 0 10px var(--neon-glow);
+        }
 
-input:focus{
-    border-color:var(--neon);
-    box-shadow:0 0 20px rgba(0,255,255,0.2);
-}
+        .copy-link {
+            font-size: 0.7rem;
+            color: var(--muted);
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-.btn{
-    width:100%;
-    margin-top:22px;
-    background:linear-gradient(135deg,#00f2ff,#00bfff);
-    border:none;
-    border-radius:14px;
-    padding:18px;
-    color:#000;
-    font-weight:800;
-    letter-spacing:2px;
-    cursor:pointer;
-    transition:0.3s;
-    box-shadow:0 0 20px rgba(0,255,255,0.3);
-}
+        .copy-link:hover { color: var(--neon); }
 
-.result{
-    margin-top:25px;
-    display:none;
-}
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            color: var(--muted);
+            opacity: 0.6;
+        }
 
-.result.show{
-    display:block;
-}
+       
+        .floating-controls {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
 
-.code-display{
-    background:rgba(0,255,255,0.05);
-    border:1px dashed var(--neon);
-    border-radius:15px;
-    padding:25px;
-    text-align:center;
-}
+        .f-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
 
-.code-text{
-    font-family:'JetBrains Mono',monospace;
-    font-size:2rem;
-    letter-spacing:8px;
-    color:var(--neon);
-}
+        .f-btn:hover { border-color: var(--neon); color: var(--neon); }
 
-.copy-link{
-    margin-top:15px;
-    color:var(--muted);
-    cursor:pointer;
-    font-size:0.8rem;
-}
-
-.footer{
-    margin-top:35px;
-    text-align:center;
-    color:var(--muted);
-    letter-spacing:4px;
-    font-size:0.65rem;
-}
-
-.floating-controls{
-    position:fixed;
-    top:20px;
-    right:20px;
-    display:flex;
-    gap:12px;
-    z-index:999;
-}
-
-.f-btn{
-    background:rgba(15,15,15,0.7);
-    border:1px solid rgba(0,255,255,0.1);
-    color:#fff;
-    padding:12px 16px;
-    border-radius:50px;
-    cursor:pointer;
-    backdrop-filter:blur(10px);
-    transition:0.3s;
-}
-
-@media(max-width:480px){
-    .brand h1{
-        font-size:1.6rem;
-        letter-spacing:5px;
-    }
-
-    .card{
-        padding:28px 20px;
-    }
-}
-</style>
+    </style>
 </head>
-
 <body>
 
 <div class="bg-animate">
     <div class="blob"></div>
-    <div class="blob"></div>
 </div>
 
 <div class="floating-controls">
-    <button class="f-btn" onclick="toggleMusic()" id="mBtn">MUSIC OFF 🎵</button>
+    <button class="f-btn" onclick="toggleMusic()" id="mBtn">𝐌𝐔𝐒𝐈𝐂: 𝐎𝐅𝐅 🎵</button>
+    <button class="f-btn" onclick="toggleTheme()">𝐌𝐎𝐃𝐄 🌓</button>
 </div>
 
 <audio id="bgMusic" loop>
@@ -320,141 +280,112 @@ input:focus{
 </audio>
 
 <div class="container">
-
     <div class="brand">
-        <h1>𝐑𝐈𝐊𝐀 𝐗𝐌𝐃 FREE BOT</h1>
-        <div class="subtext">𝐑ɪᴋᴀ ᴛᴇᴀᴄʜ ꜰʀᴇᴇ ʙᴏᴛ🚶‍♂️</div>
+        <h1>𝐑𝐈𝐊𝐀 𝐅𝐑𝐄𝐄 𝐌𝐈𝐍𝐈 𝐁𝐎𝐓</h1>
+        <div style="font-size: 0.6rem; color: var(--muted); margin-top: 10px; letter-spacing: 3px;">
+            <span style="color: var(--neon);">●</span> 𝐑ɪᴋᴀ ᴛᴇᴀᴄʜ xᴍᴅ ᴍɪɴɪ ʙᴏᴛ ⚡
+        </div>
     </div>
 
     <div class="card">
+        <label class="label">01. 𝐄ɴᴛᴇʀ ᴘʜᴏɴᴇ ɴᴜᴍʙᴇʀ</label>
+        <div class="input-wrapper">
+            <input type="tel" id="phoneInput" placeholder="947XXXXXXXX" maxlength="15">
+        </div>
 
-        <label class="label">01. ENTER PHONE NUMBER</label>
-
-        <input
-            type="tel"
-            id="phoneInput"
-            placeholder="94766619###"
-            autocomplete="off"
-        >
-
-        <button class="btn" onclick="getPairingCode()" id="pairBtn">
+        <button class="btn" id="pairBtn" onclick="getPairingCode()">
             <span id="btnText">𝐆ᴇᴛ ᴘᴀɪʀɪɴɢ ᴄᴏᴅᴇ</span>
         </button>
 
         <div class="result" id="result"></div>
-
     </div>
 
-    <div class="footer">
-        POWERED BY SHAMIKA DENUWAN
-    </div>
-
+    <div class="footer">𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ </div>
 </div>
 
 <script>
+    async function getPairingCode() {
+        const input = document.getElementById('phoneInput');
+        const btn = document.getElementById('pairBtn');
+        const btnText = document.getElementById('btnText');
+        const resultDiv = document.getElementById('result');
 
-const phoneInput=document.getElementById("phoneInput");
+        const number = input.value.trim().replace(/[^0-9]/g, '');
 
-phoneInput.addEventListener("touchstart", function(){
-    this.focus();
-});
-
-phoneInput.addEventListener("click", function(){
-    this.focus();
-});
-
-async function getPairingCode(){
-
-    const input=document.getElementById('phoneInput');
-    const number=input.value.trim().replace(/[^0-9]/g,'');
-
-    const btn=document.getElementById('pairBtn');
-    const btnText=document.getElementById('btnText');
-    const result=document.getElementById('result');
-
-    if(number.length<7){
-        showError('INVALID NUMBER');
-        return;
-    }
-
-    btn.disabled=true;
-    btnText.innerHTML='LOADING...';
-
-    try{
-
-        const response=await fetch(`/pair?number=${number}`);
-        const data=await response.json();
-
-        if(data.code){
-            showCode(data.code);
-        }else{
-            showError(data.error || 'SERVER ERROR');
+        if (number.length < 7) {
+            showError('Invalid Format!');
+            return;
         }
 
-    }catch(err){
-        showError('SERVER OFFLINE');
+        btn.disabled = true;
+        btnText.innerHTML = '<center><div class="loader"></div></center>';
+        resultDiv.classList.remove('show');
+
+        try {
+            const response = await fetch(`/pair?number=${number}`);
+            const data = await response.json();
+
+            if (data.code) {
+                showCode(data.code, number);
+            } else {
+                showError(data.error || 'Connection Error');
+            }
+        } catch (err) {
+            showError('Server Offline');
+        } finally {
+            btn.disabled = false;
+            btnText.innerHTML = 'GET PAIRING CODE';
+        }
     }
 
-    btn.disabled=false;
-    btnText.innerHTML='GET PAIRING CODE';
-}
-
-function showCode(code){
-
-    const result=document.getElementById('result');
-
-    result.innerHTML=`
-    <div class="code-display">
-        <div class="code-text">${code}</div>
-        <div class="copy-link" onclick="copyCode('${code}')">CLICK TO COPY</div>
-    </div>
-    `;
-
-    result.classList.add('show');
-}
-
-function showError(msg){
-
-    const result=document.getElementById('result');
-
-    result.innerHTML=`
-    <div style="padding:12px;border-radius:10px;background:rgba(255,0,0,0.08);border:1px solid red;text-align:center;color:red;">
-        ${msg}
-    </div>
-    `;
-
-    result.classList.add('show');
-}
-
-function copyCode(code){
-
-    navigator.clipboard.writeText(code);
-
-    const link=document.querySelector('.copy-link');
-
-    link.innerText='COPIED SUCCESSFULLY';
-
-    setTimeout(()=>{
-        link.innerText='CLICK TO COPY';
-    },2000);
-}
-
-let isPlaying=false;
-const music=document.getElementById('bgMusic');
-
-function toggleMusic(){
-
-    if(isPlaying){
-        music.pause();
-        document.getElementById('mBtn').innerText='MUSIC OFF 🎵';
-    }else{
-        music.play();
-        document.getElementById('mBtn').innerText='MUSIC ON 🔊';
+    function showCode(code, number) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `
+            <div class="code-display">
+                <div class="code-text">${code}</div>
+                <div class="copy-link" onclick="copyCode('${code}')">CLICK TO COPY CODE</div>
+            </div>
+            <p style="font-size: 0.7rem; color: var(--muted); margin-top: 15px; line-height: 1.5; text-align: center;">
+                Go to WhatsApp Settings > Linked Devices > Link with Phone Number.
+            </p>
+        `;
+        resultDiv.classList.add('show');
     }
 
-    isPlaying=!isPlaying;
-}
+    function showError(msg) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = `<div style="color: var(--error); text-align: center; font-size: 0.8rem; border: 1px solid var(--error); padding: 10px; border-radius: 5px;">${msg}</div>`;
+        resultDiv.classList.add('show');
+    }
+
+    function copyCode(code) {
+        navigator.clipboard.writeText(code);
+        const link = document.querySelector('.copy-link');
+        link.innerText = 'COPIED SUCCESSFULLY!';
+        link.style.color = 'var(--neon)';
+        setTimeout(() => {
+            link.innerText = 'CLICK TO COPY CODE';
+            link.style.color = 'var(--muted)';
+        }, 2000);
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+    }
+
+    let isPlaying = false;
+    const music = document.getElementById('bgMusic');
+    function toggleMusic() {
+        if (isPlaying) {
+            music.pause();
+            document.getElementById('mBtn').innerText = "MUSIC: OFF 🎵";
+        } else {
+            music.play();
+            document.getElementById('mBtn').innerText = "MUSIC: ON 🔊";
+        }
+        isPlaying = !isPlaying;
+    }
 </script>
 
 </body>
-            </html>
+    </html>
