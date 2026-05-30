@@ -1,17 +1,17 @@
-const os = require('os')
+const os = require("os");
 
 module.exports = {
-pattern: 'menu',
-alias: ['panel','help'],
-desc: 'Show Menu',
-category: 'main',
-react: '📜',
+    pattern: "menu",
+    alias: ["panel", "help"],
+    desc: "Show Menu",
+    category: "main",
+    react: "📜",
 
-async run(conn, mek, m, { from, pushname }) {
+    async run(conn, mek, m, { from, pushname }) {
 
-const menuText = `
+        const menuText = `
 ╭━━〔 *RIKA XMD V3* 〕━━⬣
-┃ ✦ Hello ${pushname}
+┃ ✦ Hello ${pushname || "User"}
 ┃ ✦ Owner : Shamika
 ┃ ✦ Mode : Public
 ┃ ✦ Platform : ${os.platform()}
@@ -39,20 +39,19 @@ const menuText = `
 ╰━━━━━━━━━━⬣
 
 > MADE BY SHAMIKA DENUWAN
-`
+`;
 
-await conn.sendMessage(
-from,
-{
-image: {
-url: 'https://files.catbox.moe/lpkicb.png'
-},
-caption: menuText
-},
-{
-quoted: mek
-}
-)
-
-}
-}
+        await conn.sendMessage(
+            from,
+            {
+                image: {
+                    url: "https://files.catbox.moe/7z5x3q.jpg",
+                },
+                caption: menuText,
+            },
+            {
+                quoted: m
+            }
+        );
+    },
+};
