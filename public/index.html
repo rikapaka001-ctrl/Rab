@@ -1,390 +1,651 @@
 <!DOCTYPE html>
 <html lang="si">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RIKA FREE BOT</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #050505;
-            --surface: #0d0d0d;
-            --border: #1a1a1a;
-            --neon: #00f2ff; /* Cyan Neon */
-            --neon-glow: rgba(0, 242, 255, 0.5);
-            --text: #ffffff;
-            --muted: #888888;
-            --error: #ff3e3e;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RIKA FREE BOT</title>
 
-        body.light-mode {
-            --bg: #ffffff;
-            --surface: #f5f5f5;
-            --border: #dddddd;
-            --neon: #000000;
-            --neon-glow: rgba(0, 0, 0, 0.2);
-            --text: #000000;
-            --muted: #666666;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-        * {
-            margin: 0; padding: 0;
-            box-sizing: border-box;
-        }
+<style>
 
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            transition: background 0.5s ease;
-        }
+:root{
+    --bg:#050505;
+    --surface:#0d0d0d;
+    --border:#1a1a1a;
+    --neon:#00f2ff;
+    --neon-glow:rgba(0,242,255,0.5);
+    --text:#ffffff;
+    --muted:#888888;
+    --error:#ff3e3e;
+}
 
-        
-        .bg-animate {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
-            overflow: hidden;
-        }
-        
-        .blob {
-            position: absolute;
-            width: 300px; height: 300px;
-            background: var(--neon);
-            filter: blur(80px);
-            border-radius: 50%;
-            opacity: 0.05;
-            animation: move 20s infinite alternate;
-        }
+body.light-mode{
+    --bg:#ffffff;
+    --surface:#f5f5f5;
+    --border:#dddddd;
+    --neon:#000000;
+    --neon-glow:rgba(0,0,0,0.2);
+    --text:#000000;
+    --muted:#666666;
+}
 
-        @keyframes move {
-            from { transform: translate(-10%, -10%); }
-            to { transform: translate(110%, 110%); }
-        }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        
-        .container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 420px;
-            padding: 20px;
-            animation: fadeInScale 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    transition:0.5s;
+}
 
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
+.bg-animate{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:-1;
+    overflow:hidden;
+}
 
-        .brand {
-            text-align: center;
-            margin-bottom: 40px;
-        }
+.blob{
+    position:absolute;
+    width:300px;
+    height:300px;
+    background:var(--neon);
+    filter:blur(90px);
+    border-radius:50%;
+    opacity:0.08;
+    animation:move 20s infinite alternate;
+}
 
-        .brand h1 {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.8rem;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            color: var(--neon);
-            text-shadow: 0 0 15px var(--neon-glow);
-            /* --- Animation 3: Text Flicker --- */
-            animation: flicker 3s infinite;
-        }
+@keyframes move{
+    from{
+        transform:translate(-10%,-10%);
+    }
+    to{
+        transform:translate(110%,110%);
+    }
+}
 
-        @keyframes flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% { text-shadow: 0 0 15px var(--neon-glow); }
-            20%, 24%, 55% { text-shadow: none; opacity: 0.8; }
-        }
+.container{
+    width:100%;
+    max-width:430px;
+    padding:20px;
+}
 
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 40px 30px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transition: all 0.4s ease;
-        }
+.brand{
+    text-align:center;
+    margin-bottom:35px;
+}
 
-        
-        .card:focus-within {
-            border-color: var(--neon);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.15);
-        }
+.brand h1{
+    font-size:1.7rem;
+    letter-spacing:5px;
+    color:var(--neon);
+    font-family:'JetBrains Mono',monospace;
+    text-shadow:0 0 15px var(--neon-glow);
+    animation:flicker 3s infinite;
+}
 
-        .label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--neon);
-            margin-bottom: 20px;
-            display: block;
-            letter-spacing: 1px;
-        }
+@keyframes flicker{
+    0%,18%,22%,25%,53%,57%,100%{
+        text-shadow:0 0 15px var(--neon-glow);
+    }
+    20%,24%,55%{
+        text-shadow:none;
+        opacity:0.8;
+    }
+}
 
-        .input-wrapper {
-            margin-bottom: 25px;
-            position: relative;
-        }
+.card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:35px 25px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.5);
+}
 
-        input[type="tel"] {
-            width: 100%;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.2rem;
-            padding: 15px;
-            outline: none;
-            transition: 0.3s;
-        }
+.card:focus-within{
+    border-color:var(--neon);
+    box-shadow:0 0 30px rgba(0,242,255,0.15);
+}
 
-        input[type="tel"]:focus {
-            background: rgba(255,255,255,0.05);
-            border-color: var(--neon);
-        }
+.label{
+    font-size:0.75rem;
+    color:var(--neon);
+    margin-bottom:20px;
+    display:block;
+    letter-spacing:1px;
+    font-family:'JetBrains Mono',monospace;
+}
 
-        
-        .btn {
-            width: 100%;
-            background: var(--neon);
-            color: #000;
-            border: none;
-            padding: 18px;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 800;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
+.input-wrapper{
+    margin-bottom:25px;
+}
 
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px var(--neon-glow);
-            filter: brightness(1.1);
-        }
+input{
+    width:100%;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--border);
+    border-radius:8px;
+    color:var(--text);
+    font-family:'JetBrains Mono',monospace;
+    font-size:1rem;
+    padding:15px;
+    outline:none;
+    transition:0.3s;
+}
 
-        .btn:active { transform: translateY(0); }
+input:focus{
+    border-color:var(--neon);
+}
 
-        .loader {
-            width: 18px; height: 18px;
-            border: 3px solid #000;
-            border-top: 3px solid transparent;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
+.btn{
+    width:100%;
+    background:var(--neon);
+    color:#000;
+    border:none;
+    padding:17px;
+    border-radius:8px;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:800;
+    cursor:pointer;
+    transition:0.3s;
+}
 
-        @keyframes spin { to { transform: rotate(360deg); } }
+.btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px var(--neon-glow);
+}
 
-        .result {
-            margin-top: 25px;
-            display: none;
-        }
+.result{
+    margin-top:25px;
+    display:none;
+}
 
-        .result.show { 
-            display: block; 
-            animation: slideIn 0.5s ease forwards;
-        }
+.result.show{
+    display:block;
+    animation:fade 0.4s ease;
+}
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+@keyframes fade{
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
 
-        .code-display {
-            background: rgba(0, 242, 255, 0.05);
-            border: 1px dashed var(--neon);
-            border-radius: 8px;
-            padding: 25px;
-            text-align: center;
-        }
+.code-display{
+    background:rgba(0,242,255,0.05);
+    border:1px dashed var(--neon);
+    border-radius:8px;
+    padding:25px;
+    text-align:center;
+}
 
-        .code-text {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 2.2rem;
-            font-weight: 700;
-            letter-spacing: 10px;
-            color: var(--neon);
-            text-shadow: 0 0 10px var(--neon-glow);
-        }
+.code-text{
+    font-size:2rem;
+    letter-spacing:8px;
+    color:var(--neon);
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+}
 
-        .copy-link {
-            font-size: 0.7rem;
-            color: var(--muted);
-            margin-top: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+.copy-link{
+    font-size:0.7rem;
+    margin-top:15px;
+    color:var(--muted);
+    cursor:pointer;
+}
 
-        .copy-link:hover { color: var(--neon); }
+.copy-link:hover{
+    color:var(--neon);
+}
 
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            font-size: 0.65rem;
-            letter-spacing: 4px;
-            color: var(--muted);
-            opacity: 0.6;
-        }
+.footer{
+    text-align:center;
+    margin-top:35px;
+    font-size:0.65rem;
+    color:var(--muted);
+    letter-spacing:4px;
+}
 
-       
-        .floating-controls {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            display: flex;
-            gap: 15px;
-            z-index: 100;
-        }
+.floating-controls{
+    position:fixed;
+    top:20px;
+    right:20px;
+    display:flex;
+    gap:10px;
+}
 
-        .f-btn {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 10px 15px;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: 0.3s;
-        }
+.f-btn{
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px 15px;
+    border-radius:50px;
+    cursor:pointer;
+}
 
-        .f-btn:hover { border-color: var(--neon); color: var(--neon); }
+.f-btn:hover{
+    border-color:var(--neon);
+    color:var(--neon);
+}
 
-    </style>
+.loader{
+    width:18px;
+    height:18px;
+    border:3px solid #000;
+    border-top:3px solid transparent;
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+    margin:auto;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.status-box{
+    padding:15px;
+    border-radius:8px;
+    margin-bottom:15px;
+    font-size:0.8rem;
+    font-family:'JetBrains Mono',monospace;
+}
+
+.online{
+    border:1px solid #00ff99;
+    color:#00ff99;
+    background:rgba(0,255,100,0.1);
+}
+
+.offline{
+    border:1px solid red;
+    color:red;
+    background:rgba(255,0,0,0.1);
+}
+
+</style>
 </head>
+
 <body>
 
 <div class="bg-animate">
-    <div class="blob"></div>
+<div class="blob"></div>
 </div>
 
 <div class="floating-controls">
-    <button class="f-btn" onclick="toggleMusic()" id="mBtn">𝐌𝐔𝐒𝐈𝐂: 𝐎𝐅𝐅 🎵</button>
-    <button class="f-btn" onclick="toggleTheme()">𝐌𝐎𝐃𝐄 🌓</button>
+<button class="f-btn" onclick="toggleMusic()" id="mBtn">MUSIC OFF 🎵</button>
+<button class="f-btn" onclick="toggleTheme()">MODE 🌓</button>
 </div>
 
 <audio id="bgMusic" loop>
-    <source src="https://files.catbox.moe/srf3p5.mp3" type="audio/mpeg">
+<source src="https://files.catbox.moe/srf3p5.mp3" type="audio/mpeg">
 </audio>
 
 <div class="container">
-    <div class="brand">
-        <h1>𝐑𝐈𝐊𝐀 𝐅𝐑𝐄𝐄 𝐌𝐈𝐍𝐈 𝐁𝐎𝐓</h1>
-        <div style="font-size: 0.6rem; color: var(--muted); margin-top: 10px; letter-spacing: 3px;">
-            <span style="color: var(--neon);">●</span> 𝐑ɪᴋᴀ ᴛᴇᴀᴄʜ xᴍᴅ ᴍɪɴɪ ʙᴏᴛ ⚡
-        </div>
-    </div>
 
-    <div class="card">
-        <label class="label">01. 𝐄ɴᴛᴇʀ ᴘʜᴏɴᴇ ɴᴜᴍʙᴇʀ</label>
-        <div class="input-wrapper">
-            <input type="tel" id="phoneInput" placeholder="947XXXXXXXX" maxlength="15">
-        </div>
+<div class="brand">
+<h1>𝐑𝐈𝐊𝐀 𝐅𝐑𝐄𝐄 𝐌𝐈𝐍𝐈 𝐁𝐎𝐓</h1>
 
-        <button class="btn" id="pairBtn" onclick="getPairingCode()">
-            <span id="btnText">𝐆ᴇᴛ ᴘᴀɪʀɪɴɢ ᴄᴏᴅᴇ</span>
-        </button>
+<div style="font-size:0.65rem;color:var(--muted);margin-top:10px;">
+● RIKA TEACH XMD MINI BOT ⚡
+</div>
+</div>
 
-        <div class="result" id="result"></div>
-    </div>
+<div class="card">
 
-    <div class="footer">𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ </div>
+<label class="label">
+01. ENTER PHONE NUMBER
+</label>
+
+<div class="input-wrapper">
+<input type="tel" id="phoneInput" placeholder="947XXXXXXXX">
+</div>
+
+<button class="btn" id="pairBtn" onclick="getPairingCode()">
+<span id="btnText">GET PAIRING CODE</span>
+</button>
+
+<div class="result" id="result"></div>
+
+<div style="margin-top:20px;">
+<button class="btn"
+onclick="openOwnerPanel()"
+style="
+background:#111;
+color:var(--neon);
+border:1px solid var(--neon);
+">
+OWNER PANEL 🔐
+</button>
+</div>
+
+<div class="result" id="ownerLoginBox">
+
+<div class="code-display">
+
+<input type="password"
+id="ownerPassword"
+placeholder="ENTER OWNER PASSWORD"
+style="
+margin-bottom:15px;
+">
+
+<button class="btn" onclick="checkOwnerPassword()">
+LOGIN OWNER PANEL
+</button>
+
+</div>
+</div>
+
+<div class="result" id="ownerPanel">
+
+<div class="code-display">
+
+<h2 style="
+color:var(--neon);
+margin-bottom:20px;
+font-family:'JetBrains Mono',monospace;
+">
+BOT CONTROL PANEL ⚡
+</h2>
+
+<div id="botStatus"
+class="status-box online">
+BOT STATUS : ACTIVE ✅
+</div>
+
+<div id="connectedNumbers"
+style="
+text-align:left;
+font-size:0.8rem;
+background:#111;
+padding:15px;
+border-radius:8px;
+border:1px solid var(--border);
+margin-bottom:15px;
+">
+CONNECTED NUMBERS:<br><br>
+NO DEVICES
+</div>
+
+<div id="totalUsers"
+style="
+margin-bottom:15px;
+font-size:0.8rem;
+color:var(--neon);
+font-family:'JetBrains Mono',monospace;
+">
+TOTAL USERS : 0
+</div>
+
+<button class="btn"
+onclick="refreshBotStatus()">
+REFRESH STATUS 🔄
+</button>
+
+<button class="btn"
+onclick="logoutPanel()"
+style="
+margin-top:10px;
+background:red;
+color:white;
+">
+LOGOUT ❌
+</button>
+
+</div>
+</div>
+
+</div>
+
+<div class="footer">
+POWERED BY SHAMIKA DENUWAN
+</div>
+
 </div>
 
 <script>
-    async function getPairingCode() {
-        const input = document.getElementById('phoneInput');
-        const btn = document.getElementById('pairBtn');
-        const btnText = document.getElementById('btnText');
-        const resultDiv = document.getElementById('result');
 
-        const number = input.value.trim().replace(/[^0-9]/g, '');
+async function getPairingCode(){
 
-        if (number.length < 7) {
-            showError('Invalid Format!');
-            return;
+    const input=document.getElementById('phoneInput');
+    const btn=document.getElementById('pairBtn');
+    const btnText=document.getElementById('btnText');
+    const resultDiv=document.getElementById('result');
+
+    const number=input.value.trim().replace(/[^0-9]/g,'');
+
+    if(number.length < 7){
+        showError('INVALID NUMBER ❌');
+        return;
+    }
+
+    btn.disabled=true;
+    btnText.innerHTML='<div class="loader"></div>';
+
+    try{
+
+        const response=await fetch(`/pair?number=${number}`);
+        const data=await response.json();
+
+        if(data.code){
+            showCode(data.code);
+        }else{
+            showError(data.error || 'SERVER ERROR');
         }
 
-        btn.disabled = true;
-        btnText.innerHTML = '<center><div class="loader"></div></center>';
-        resultDiv.classList.remove('show');
+    }catch(err){
 
-        try {
-            const response = await fetch(`/pair?number=${number}`);
-            const data = await response.json();
+        showError('SERVER OFFLINE ❌');
 
-            if (data.code) {
-                showCode(data.code, number);
-            } else {
-                showError(data.error || 'Connection Error');
-            }
-        } catch (err) {
-            showError('Server Offline');
-        } finally {
-            btn.disabled = false;
-            btnText.innerHTML = 'GET PAIRING CODE';
+    }finally{
+
+        btn.disabled=false;
+        btnText.innerHTML='GET PAIRING CODE';
+
+    }
+
+}
+
+function showCode(code){
+
+    const resultDiv=document.getElementById('result');
+
+    resultDiv.innerHTML=`
+
+    <div class="code-display">
+
+    <div class="code-text">${code}</div>
+
+    <div class="copy-link"
+    onclick="copyCode('${code}')">
+    CLICK TO COPY
+    </div>
+
+    </div>
+
+    `;
+
+    resultDiv.classList.add('show');
+
+}
+
+function showError(msg){
+
+    const resultDiv=document.getElementById('result');
+
+    resultDiv.innerHTML=`
+
+    <div style="
+    color:red;
+    border:1px solid red;
+    padding:10px;
+    border-radius:8px;
+    text-align:center;
+    ">
+    ${msg}
+    </div>
+
+    `;
+
+    resultDiv.classList.add('show');
+
+}
+
+function copyCode(code){
+
+    navigator.clipboard.writeText(code);
+
+    const link=document.querySelector('.copy-link');
+
+    link.innerText='COPIED SUCCESSFULLY ✅';
+
+    setTimeout(()=>{
+        link.innerText='CLICK TO COPY';
+    },2000);
+
+}
+
+function toggleTheme(){
+    document.body.classList.toggle('light-mode');
+}
+
+let isPlaying=false;
+
+const music=document.getElementById('bgMusic');
+
+function toggleMusic(){
+
+    if(isPlaying){
+
+        music.pause();
+        document.getElementById('mBtn').innerText='MUSIC OFF 🎵';
+
+    }else{
+
+        music.play();
+        document.getElementById('mBtn').innerText='MUSIC ON 🔊';
+
+    }
+
+    isPlaying=!isPlaying;
+
+}
+
+const OWNER_PASSWORD="lasi@#321";
+
+function openOwnerPanel(){
+
+    document.getElementById('ownerLoginBox')
+    .classList.add('show');
+
+}
+
+function checkOwnerPassword(){
+
+    const pass=document.getElementById('ownerPassword').value;
+
+    if(pass === OWNER_PASSWORD){
+
+        document.getElementById('ownerLoginBox')
+        .classList.remove('show');
+
+        document.getElementById('ownerPanel')
+        .classList.add('show');
+
+        refreshBotStatus();
+
+    }else{
+
+        alert('WRONG PASSWORD ❌');
+
+    }
+
+}
+
+function logoutPanel(){
+
+    document.getElementById('ownerPanel')
+    .classList.remove('show');
+
+}
+
+async function refreshBotStatus(){
+
+    try{
+
+        const response=await fetch('/bot-status');
+
+        const data=await response.json();
+
+        const status=document.getElementById('botStatus');
+
+        if(data.active){
+
+            status.innerHTML='BOT STATUS : ACTIVE ✅';
+
+            status.classList.remove('offline');
+            status.classList.add('online');
+
+        }else{
+
+            status.innerHTML='BOT STATUS : OFFLINE ❌';
+
+            status.classList.remove('online');
+            status.classList.add('offline');
+
         }
-    }
 
-    function showCode(code, number) {
-        const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = `
-            <div class="code-display">
-                <div class="code-text">${code}</div>
-                <div class="copy-link" onclick="copyCode('${code}')">CLICK TO COPY CODE</div>
-            </div>
-            <p style="font-size: 0.7rem; color: var(--muted); margin-top: 15px; line-height: 1.5; text-align: center;">
-                Go to WhatsApp Settings > Linked Devices > Link with Phone Number.
-            </p>
-        `;
-        resultDiv.classList.add('show');
-    }
+        let nums='CONNECTED NUMBERS:<br><br>';
 
-    function showError(msg) {
-        const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = `<div style="color: var(--error); text-align: center; font-size: 0.8rem; border: 1px solid var(--error); padding: 10px; border-radius: 5px;">${msg}</div>`;
-        resultDiv.classList.add('show');
-    }
+        if(data.numbers && data.numbers.length > 0){
 
-    function copyCode(code) {
-        navigator.clipboard.writeText(code);
-        const link = document.querySelector('.copy-link');
-        link.innerText = 'COPIED SUCCESSFULLY!';
-        link.style.color = 'var(--neon)';
-        setTimeout(() => {
-            link.innerText = 'CLICK TO COPY CODE';
-            link.style.color = 'var(--muted)';
-        }, 2000);
-    }
+            data.numbers.forEach(num=>{
 
-    function toggleTheme() {
-        document.body.classList.toggle('light-mode');
-    }
+                nums += `${num}<br>`;
 
-    let isPlaying = false;
-    const music = document.getElementById('bgMusic');
-    function toggleMusic() {
-        if (isPlaying) {
-            music.pause();
-            document.getElementById('mBtn').innerText = "MUSIC: OFF 🎵";
-        } else {
-            music.play();
-            document.getElementById('mBtn').innerText = "MUSIC: ON 🔊";
+            });
+
+        }else{
+
+            nums += 'NO CONNECTED DEVICES';
+
         }
-        isPlaying = !isPlaying;
+
+        document.getElementById('connectedNumbers')
+        .innerHTML=nums;
+
+        document.getElementById('totalUsers')
+        .innerHTML=`TOTAL USERS : ${data.numbers.length}`;
+
+    }catch(err){
+
+        console.log(err);
+
     }
+
+}
+
 </script>
 
 </body>
