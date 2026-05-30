@@ -24,7 +24,7 @@ module.exports = {
     alias: ['allmenu','panel','help'],
     desc: 'Show bot menu',
     category: 'main',
-    react: '✨',
+    react: '⚡',
 
     async execute(conn, mek, m, { from, pushname, reply }) {
 
@@ -66,40 +66,17 @@ module.exports = {
             image: { url: menuImage },
             caption: menuText,
             footer: 'RIKA XMD V3',
-            buttons: [
-                {
-                    buttonId: '.ping',
-                    buttonText: {
-                        displayText: '⚡ PING'
-                    },
-                    type: 1
-                },
-                {
-                    buttonId: '.alive',
-                    buttonText: {
-                        displayText: '🟢 ALIVE'
-                    },
-                    type: 1
-                },
-                {
-                    buttonId: '.owner',
-                    buttonText: {
-                        displayText: '👑 OWNER'
-                    },
-                    type: 1
-                }
-            ],
             headerType: 4,
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: newsletter,
-                    newsletterName: 'Ｒɪᴋᴀ Ｘᴍᴅ 🐉'
+                    newsletterName: 'RIKA XMD NEWS'
                 },
                 externalAdReply: {
                     title: 'RIKA XMD V3',
-                    body: 'SIMPLE BUTTON MENU',
+                    body: 'STYLISH MENU SYSTEM',
                     mediaType: 1,
                     renderLargerThumbnail: true,
                     thumbnailUrl: menuImage,
@@ -108,4 +85,4 @@ module.exports = {
             }
         }, { quoted: mek })
     }
-}
+    }
