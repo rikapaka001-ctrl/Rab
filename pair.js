@@ -44,7 +44,7 @@ require('events').EventEmitter.defaultMaxListeners = 500;
 
 const MONGODB_URI =
 process.env.MONGODB_URI ||
-'mongodb+srv://rika:shamika@#321@cluster0.abcd1.mongodb.net/rikadb?retryWrites=true&w=majority';
+'mongodb+srv://rika:shamika%40%23321@cluster0.abcd1.mongodb.net/rikadb?retryWrites=true&w=majority';
 
 mongoose.connect(MONGODB_URI)
 .then(() => console.log('✅ MongoDB Connected'))
