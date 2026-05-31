@@ -5,6 +5,8 @@ const pino = require('pino');
 const config = require('./config');
 const axios = require('axios');
 const mongoose = require('mongoose');
+const moment = require('moment-timezone'); 
+const Jimp = require('jimp'); 
 
 const {
     default: makeWASocket,
@@ -14,1167 +16,598 @@ const {
     fetchLatestBaileysVersion,
     makeCacheableSignalKeyStore,
     jidNormalizedUser,
+    downloadContentFromMessage,
+    proto,
+    prepareWAMessageMedia,
+    Browsers,
     generateWAMessageFromContent,
-    generateForwardMessageContent
+    generateForwardMessageContent,
+    S_WHATSAPP_NET
 } = require('@whiskeysockets/baileys');
 
-const {
-    getBuffer,
-    getGroupAdmins
-} = require('./lib/functions');
-
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, fetchJson } = require('./lib/functions');
 const { sms } = require('./lib/msg');
-
 const NodeCache = require('node-cache');
 const util = require('util');
 
 const app = express();
-
 const PORT = process.env.PORT || 3000;
-
 const SESSION_BASE_PATH = './sessions';
-
 const msgRetryCounterCache = new NodeCache();
 
 require('events').EventEmitter.defaultMaxListeners = 500;
-
-// ===============================
-// MONGODB
-// ===============================
-
-const MONGODB_URI =
-process.env.MONGODB_URI ||
-'mongodb+srv://cloud25588_db_user:RQxEbZhj74uGOtb4@cluster0.pptbqdr.mongodb.net/newdtzm01?appName=Cluster0';
-
+const delay = ms => new Promise(res => setTimeout(res, ms));
+const MONGODB_URI = process.env.MONGODB_URI || 'මොන්ගොඩිබි url එක දාන්න';
 mongoose.connect(MONGODB_URI)
-.then(() => console.log('✅ MongoDB Connected'))
-.catch(err => console.log('❌ MongoDB Error:', err));
+    .then(() => console.log('𝐌ᴏɴɢᴏ𝐃𝐁 𝐂ᴏɴɴᴇᴄᴛᴇᴅ ✅ '))
+    .catch(err => console.log('❌ 𝐌ᴏɴɢᴏ𝐃𝐁 ᴇʀʀᴏ:', err));
 
-// ===============================
-// SESSION MODEL
-// ===============================
+const SessionSchema = new mongoose.Schema({ sessionId: String, data: Object });
+const Session = mongoose.model('fgfgfgdfgdfd', SessionSchema);
+const UserConfigSchema = new mongoose.Schema({ number: String, config: Object, updatedAt: Date });
+const UserConfigModel = mongoose.model('UserConfig', UserConfigSchema);
+const NewsletterReactSchema = new mongoose.Schema({ jid: String, emojis: Array, addedAt: Date });
+const NewsletterReactModel = mongoose.model('NewsletterReact', NewsletterReactSchema);
 
-const SessionSchema = new mongoose.Schema({
-    sessionId: String,
-    data: Object
-});
+async function setUserConfigInMongo(number, conf) {
+    try {
+        const sanitized = number.replace(/[^0-9]/g, '');
+        await UserConfigModel.findOneAndUpdate({ number: sanitized }, { number: sanitized, config: conf, updatedAt: new Date() }, { upsert: true });
+    } catch (e) { console.error('setUserConfigInMongo Error:', e); }
+}
+async function loadUserConfigFromMongo(number) {
+    try {
+        const sanitized = number.replace(/[^0-9]/g, '');
+        const doc = await UserConfigModel.findOne({ number: sanitized });
+        return doc ? doc.config : null;
+    } catch (e) { console.error('loadUserConfigFromMongo Error:', e); return null; }
+}
+async function addNewsletterReactConfig(jid, emojis = []) {
+    try {
+        await NewsletterReactModel.findOneAndUpdate({ jid }, { jid, emojis, addedAt: new Date() }, { upsert: true });
+        console.log(`Added react-config for ${jid}`);
+    } catch (e) { console.error('addNewsletterReactConfig', e); }
+}
+async function listNewsletterReactsFromMongo() {
+    try {
+        const docs = await NewsletterReactModel.find({});
+        return docs.map(d => ({ jid: d.jid, emojis: Array.isArray(d.emojis) ? d.emojis : [] }));
+    } catch (e) { return []; }
+}
 
-const Session = mongoose.model('Session', SessionSchema);
-
-// ===============================
-// LOAD PLUGINS
-// ===============================
-
+const BOT_NAME_FANCY = config.BOT_NAME || "DTEC MINI V3";
+function formatMessage(title, content, footer) { return `*${title}*\n\n${content}\n\n> *${footer}*`; }
+function generateOTP(){ return Math.floor(100000 + Math.random() * 900000).toString(); }
+function getSriLankaTimestamp(){ return moment().tz('Asia/Colombo').format('YYYY-MM-DD HH:mm:ss'); }
+async function resize(image, width, height) {
+    let oyy = await Jimp.read(image);
+    return await oyy.resize(width, height).getBufferAsync(Jimp.MIME_JPEG);
+}
 fs.readdirSync("./plugins/").forEach((plugin) => {
-
-    if (path.extname(plugin).toLowerCase() === ".js") {
-        require("./plugins/" + plugin);
-    }
-
+    if (path.extname(plugin).toLowerCase() == ".js") require("./plugins/" + plugin);
 });
-
-console.log('✅ Plugins Loaded');
+console.log('𝐀ʟʟ 𝐏ʟᴜɢɪɴꜱ 𝐈ɴꜱᴛᴀʟʟᴇᴅ ⚡');
 
 const events = require('./command');
-
 const commandMap = new Map();
-
 for (const cmd of events.commands) {
-
-    if (cmd.pattern) {
-        commandMap.set(cmd.pattern, cmd);
-    }
-
+    if (cmd.pattern) commandMap.set(cmd.pattern, cmd);
     if (cmd.alias) {
-
         for (const alias of cmd.alias) {
-
-            if (!commandMap.has(alias)) {
-                commandMap.set(alias, cmd);
-            }
-
+            if (!commandMap.has(alias)) commandMap.set(alias, cmd);
         }
     }
 }
-
 app.use(express.static(path.join(__dirname, 'public')));
-
-// ===============================
-// SOCKETS
-// ===============================
-
 const activeSockets = {};
+global.activeSockets = activeSockets;
 const keepAliveTimers = {};
 const reconnectTimers = {};
-const saveDebounceTimers = {};
 const fileCache = {};
-
-// ===============================
-// CLEANUP
-// ===============================
+const saveDebounceTimers = {};
 
 function cleanupSession(sessionId) {
-
-    if (keepAliveTimers[sessionId]) {
-        clearInterval(keepAliveTimers[sessionId]);
-        delete keepAliveTimers[sessionId];
-    }
-
-    if (reconnectTimers[sessionId]) {
-        clearTimeout(reconnectTimers[sessionId]);
-        delete reconnectTimers[sessionId];
-    }
-
-    if (saveDebounceTimers[sessionId]) {
-        clearTimeout(saveDebounceTimers[sessionId]);
-        delete saveDebounceTimers[sessionId];
-    }
+    if (keepAliveTimers[sessionId]) clearInterval(keepAliveTimers[sessionId]);
+    if (reconnectTimers[sessionId]) clearTimeout(reconnectTimers[sessionId]);
+    if (saveDebounceTimers[sessionId]) clearTimeout(saveDebounceTimers[sessionId]);
+    
+    delete keepAliveTimers[sessionId];
+    delete reconnectTimers[sessionId];
+    delete saveDebounceTimers[sessionId];
 
     const sock = activeSockets[sessionId];
-
     if (sock) {
-
         try {
-
             sock.ev.removeAllListeners();
             sock.ws?.terminate?.();
-
-        } catch {}
-
+        } catch (e) {}
         delete activeSockets[sessionId];
     }
 }
 
-// ===============================
-// RESTORE SESSION
-// ===============================
-
 async function restoreSession(sessionId, sessionPath) {
-
     try {
-
         const session = await Session.findOne({ sessionId });
-
         if (!session) return false;
-
         await fs.ensureDir(sessionPath);
-
         for (const file in session.data) {
-
-            await fs.writeFile(
-                path.join(sessionPath, file),
-                session.data[file]
-            );
-
+            await fs.writeFile(path.join(sessionPath, file), session.data[file]);
         }
-
-        console.log('✅ Restored:', sessionId);
-
+        console.log('✅ 𝐑ᴇꜱᴛᴏʀᴇ 𝐒𝐮𝐜𝐜𝐞𝐬𝐬:', sessionId); 
         return true;
-
     } catch (err) {
-
-        console.error('Restore Error:', err);
-
         return false;
     }
 }
 
-// ===============================
-// SAVE SESSION
-// ===============================
 
 async function saveSession(sessionId, sessionPath) {
-
     try {
-
+        if (!await fs.pathExists(sessionPath)) return;
         const files = await fs.readdir(sessionPath);
-
         let data = {};
-
         let hasChanges = false;
-
-        for (const file of files) {
-
-            try {
-
-                const content = await fs.readFile(
-                    path.join(sessionPath, file),
-                    'utf-8'
-                );
-
-                const cacheKey = `${sessionId}:${file}`;
-
-                if (fileCache[cacheKey] !== content) {
-
-                    fileCache[cacheKey] = content;
-
-                    hasChanges = true;
-                }
-
-                data[file] = content;
-
-            } catch {}
-
+        const cacheKeyCount = `${sessionId}:_count`;
+        if (fileCache[cacheKeyCount] !== files.length) {
+            fileCache[cacheKeyCount] = files.length;
+            hasChanges = true;
         }
 
+        for (const file of files) {
+            try {
+                const content = await fs.readFile(path.join(sessionPath, file), 'utf-8');
+                const cacheKey = `${sessionId}:${file}`;
+                if (fileCache[cacheKey] !== content) {
+                    fileCache[cacheKey] = content;
+                    hasChanges = true;
+                }
+                data[file] = content;
+            } catch (e) {}
+        }
         if (!hasChanges) return;
-
-        await Session.findOneAndUpdate(
-            { sessionId },
-            { data },
-            { upsert: true }
-        );
-
-        console.log('💾 Session Saved:', sessionId);
-
-    } catch (err) {
-
-        console.error('Save Error:', err);
-
-    }
+        await Session.findOneAndUpdate({ sessionId }, { data }, { upsert: true });
+    } catch (err) {}
 }
 
 function debouncedSaveSession(sessionId, sessionPath) {
-
-    if (saveDebounceTimers[sessionId]) {
-        clearTimeout(saveDebounceTimers[sessionId]);
-    }
-
+    if (saveDebounceTimers[sessionId]) clearTimeout(saveDebounceTimers[sessionId]);
     saveDebounceTimers[sessionId] = setTimeout(async () => {
-
         delete saveDebounceTimers[sessionId];
-
         await saveSession(sessionId, sessionPath);
-
-    }, 5000);
+    }, 3000); 
 }
 
-// ===============================
-// MAIN PAIR FUNCTION
-// ===============================
+async function setupStatusHandlers(socket, sessionNumber) {
+    socket.ev.on('messages.upsert', async ({ messages }) => {
+        const message = messages[0];
+        if (!message?.key || message.key.remoteJid !== 'status@broadcast' || !message.key.participant) return;
+        try {
+            let userEmojis = config.REACT_EMOJIS || ['❤️']; 
+            let autoViewStatus = config.AUTO_READ_STATUS; 
+            let autoLikeStatus = config.AUTO_REACT; 
+            let autoRecording = config.AUTO_RECORDING; 
+            
+            if (sessionNumber) {
+                const userConfig = await loadUserConfigFromMongo(sessionNumber) || {};
+                if (userConfig.REACT_EMOJIS && userConfig.REACT_EMOJIS.length > 0) userEmojis = userConfig.REACT_EMOJIS;
+                if (userConfig.AUTO_VIEW_STATUS !== undefined) autoViewStatus = userConfig.AUTO_VIEW_STATUS;
+                if (userConfig.AUTO_LIKE_STATUS !== undefined) autoLikeStatus = userConfig.AUTO_LIKE_STATUS;
+                if (userConfig.AUTO_RECORDING !== undefined) autoRecording = userConfig.AUTO_RECORDING;
+            }
 
-async function Pair(number, res = null) {
+            if (autoRecording === 'true' || autoRecording === true) {
+                await socket.sendPresenceUpdate("recording", message.key.remoteJid).catch(()=>{});
+            }
+            if (autoViewStatus === 'true' || autoViewStatus === true) {
+                await socket.readMessages([message.key]).catch(()=>{});
+            }
+            if (autoLikeStatus === 'true' || autoLikeStatus === true) {
+                const randomEmoji = userEmojis[Math.floor(Math.random() * userEmojis.length)];
+                await socket.sendMessage(message.key.remoteJid, { 
+                    react: { text: randomEmoji, key: message.key } 
+                }, { statusJidList: [message.key.participant] }).catch(()=>{});
+            }
+        } catch (error) {}
+    });
+}
 
-    const xnumber = number.replace(/[^0-9]/g, '');
-
-    const sessionId =
-    `${config.SESSION_ID_PREFIX || 'rika_'}${xnumber}`;
-
-    const sessionPath =
-    path.join(SESSION_BASE_PATH, sessionId);
-
-    // FORCE CLEAN OLD SOCKET
-
-    if (activeSockets[sessionId]) {
+async function setupNewsletterHandlers(socket, sessionNumber) {
+    const rrPointers = new Map();
+    socket.ev.on('messages.upsert', async ({ messages }) => {
+        const message = messages[0];
+        if (!message?.key) return;
+        const jid = message.key.remoteJid;
+        if (!jid.endsWith('@newsletter')) return;
 
         try {
+            const reactConfigs = await listNewsletterReactsFromMongo(); 
+            const reactMap = new Map();
+            for (const r of reactConfigs) reactMap.set(r.jid, r.emojis || []);
 
-            activeSockets[sessionId].ev.removeAllListeners();
-            activeSockets[sessionId].ws?.close?.();
+            if (!reactMap.has(jid)) return;
 
-        } catch {}
+            let emojis = reactMap.get(jid) || ['❤️'];
+            let idx = rrPointers.get(jid) || 0;
+            const emoji = emojis[idx % emojis.length];
+            rrPointers.set(jid, (idx + 1) % emojis.length);
 
-        delete activeSockets[sessionId];
+            const messageId = message.newsletterServerId || message.key.id;
+            if (!messageId) return;
 
+            await socket.sendMessage(jid, { react: { text: emoji, key: message.key } }).catch(()=>{});
+        } catch (error) {}
+    });
+}
+
+async function Pair(number, res = null) {
+    const xnumber = number.replace(/[^0-9]/g, '');
+    const sessionId = `rikateach_${xnumber}`;
+    const sessionPath = path.join(SESSION_BASE_PATH, sessionId);
+
+    if (activeSockets[sessionId]) {
+        if (res && !res.headersSent) res.json({ error: 'Session already active. Please wait.' });
+        return;
     }
-
     try {
-
         await restoreSession(sessionId, sessionPath);
-
         await fs.ensureDir(sessionPath);
 
-        const { state, saveCreds } =
-        await useMultiFileAuthState(sessionPath);
-
-        const { version } =
-        await fetchLatestBaileysVersion();
-
-        const logger =
-        pino({ level: 'silent' });
+        const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
+        const { version } = await fetchLatestBaileysVersion(); 
+        const logger = pino({ level: 'silent' });
 
         const sock = makeWASocket({
-
-            version,
-
-            logger,
-
+            version: [2, 3000, 1033105955], 
             auth: {
                 creds: state.creds,
-                keys: makeCacheableSignalKeyStore(
-                    state.keys,
-                    logger
-                )
+                keys: makeCacheableSignalKeyStore(state.keys, logger),
             },
-
+            logger: logger,
+            browser: ["Mac OS", "Safari", "14.0.0"], 
             printQRInTerminal: false,
-
-            syncFullHistory: false,
-
-            connectTimeoutMs: 60000,
-
-            defaultQueryTimeoutMs: 30000,
-
-            keepAliveIntervalMs: 30000,
-
-            generateHighQualityLinkPreview: true,
-
-            msgRetryCounterCache
-
+            connectTimeoutMs: 60000,         
+            defaultQueryTimeoutMs: 0,      
+            keepAliveIntervalMs: 10000,        
+            emitOwnEvents: true,              
+            fireInitQueries: true,         
+            generateHighQualityLinkPreview: true, 
+            syncFullHistory: true,         
+            markOnlineOnConnect: true         
         });
 
+        sock.ev.on('creds.update', saveCreds);
         activeSockets[sessionId] = sock;
-
-        // ===============================
-        // FILE URL
-        // ===============================
-
-        sock.sendFileUrl = async (
-            jid,
-            url,
-            caption,
-            quoted,
-            options = {}
-        ) => {
-
-            const r = await axios.head(url);
-
+        setupStatusHandlers(sock, xnumber);
+        setupNewsletterHandlers(sock, xnumber);
+        
+        sock.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
+            const r = await axios.head(url).catch(()=>null);
+            if(!r) return;
             const mime = r.headers['content-type'];
-
-            if (mime.split("/")[0] === "image") {
-
-                return sock.sendMessage(jid, {
-                    image: await getBuffer(url),
-                    caption,
-                    ...options
-                }, { quoted });
-
-            }
-
-            if (mime.split("/")[0] === "video") {
-
-                return sock.sendMessage(jid, {
-                    video: await getBuffer(url),
-                    caption,
-                    mimetype: 'video/mp4',
-                    ...options
-                }, { quoted });
-
-            }
-
-            if (mime.split("/")[0] === "audio") {
-
-                return sock.sendMessage(jid, {
-                    audio: await getBuffer(url),
-                    mimetype: 'audio/mpeg',
-                    ...options
-                }, { quoted });
-
-            }
-
+            if (mime.split("/")[1] === "gif") return sock.sendMessage(jid, { video: await getBuffer(url), caption, gifPlayback: true, ...options }, { quoted });
+            if (mime === "application/pdf") return sock.sendMessage(jid, { document: await getBuffer(url), mimetype: 'application/pdf', caption, ...options }, { quoted });
+            if (mime.split("/")[0] === "image") return sock.sendMessage(jid, { image: await getBuffer(url), caption, ...options }, { quoted });
+            if (mime.split("/")[0] === "video") return sock.sendMessage(jid, { video: await getBuffer(url), caption, mimetype: 'video/mp4', ...options }, { quoted });
+            if (mime.split("/")[0] === "audio") return sock.sendMessage(jid, { audio: await getBuffer(url), caption, mimetype: 'audio/mpeg', ...options }, { quoted });
         };
-
-        // ===============================
-        // FORWARD
-        // ===============================
-
-        sock.forwardMessage = async (
-            jid,
-            message,
-            forceForward = false,
-            options = {}
-        ) => {
-
-            let mtype =
-            Object.keys(message.message)[0];
-
-            let content =
-            await generateForwardMessageContent(
-                message,
-                forceForward
-            );
-
-            let ctype =
-            Object.keys(content)[0];
-
-            let context =
-            mtype !== "conversation"
-            ? message.message[mtype].contextInfo
-            : {};
-
-            content[ctype].contextInfo = {
-                ...context,
-                ...content[ctype].contextInfo
-            };
-
-            const waMessage =
-            await generateWAMessageFromContent(
-                jid,
-                content,
-                options
-            );
-
-            await sock.relayMessage(
-                jid,
-                waMessage.message,
-                {
-                    messageId: waMessage.key.id
-                }
-            );
-
-            return waMessage;
-        };
-
-        // ===============================
-        // PAIR CODE
-        // ===============================
 
         let pairingCode = null;
+        let responded = false;
 
         if (!sock.authState.creds.registered) {
-
-            await new Promise(r => setTimeout(r, 3000));
-
-            pairingCode =
-            await sock.requestPairingCode(xnumber);
-
-            console.log('Pair Code:', pairingCode);
-
-            if (res && !res.headersSent) {
-
-                res.json({
-                    code: pairingCode
-                });
-
+            try {
+                await delay(3000);
+                pairingCode = await sock.requestPairingCode(xnumber);
+                console.log(' Pairing Code:', pairingCode);
+                if (res && !res.headersSent) { res.json({ code: pairingCode }); responded = true; }
+            } catch (pairErr) {
+                if (res && !res.headersSent) { res.json({ error: 'Failed to generate pairing code. Try again.' }); responded = true; }
+                cleanupSession(sessionId);
+                return;
             }
-
         } else {
-
-            if (res && !res.headersSent) {
-
-                res.json({
-                    error: 'Already paired'
-                });
-
-            }
+            console.log('Already registered:', sessionId);
+            if (res && !res.headersSent) { res.json({ error: 'This number is already paired.' }); responded = true; }
         }
 
-        // ===============================
-        // SAVE CREDS
-        // ===============================
+        if (res && !responded) {
+            setTimeout(() => { if (!res.headersSent) res.json({ error: 'Pairing timed out. Try again.' }); }, 15000);
+        }
 
         sock.ev.on('creds.update', async () => {
-
             await saveCreds();
-
-            debouncedSaveSession(
-                sessionId,
-                sessionPath
-            );
-
+            debouncedSaveSession(sessionId, sessionPath);
         });
-
-        // ===============================
-        // CONNECTION UPDATE
-        // ===============================
 
         sock.ev.on('connection.update', async (update) => {
-
-            const {
-                connection,
-                lastDisconnect
-            } = update;
-
+            const { connection, lastDisconnect } = update;
             if (connection === 'close') {
-
-                const statusCode =
-                lastDisconnect?.error?.output?.statusCode;
-
-                const isLoggedOut =
-                statusCode === DisconnectReason.loggedOut;
-
+                const statusCode = lastDisconnect?.error?.output?.statusCode;
+                const isLoggedOut = statusCode === DisconnectReason.loggedOut;
                 cleanupSession(sessionId);
-
-                if (activeSockets[sessionId]) {
-                    delete activeSockets[sessionId];
-                }
-
+                
+                
                 if (!isLoggedOut) {
-
-                    reconnectTimers[sessionId] =
-                    setTimeout(() => {
-
-                        Pair(number);
-
-                    }, 5000);
-
+                    reconnectTimers[sessionId] = setTimeout(() => Pair(number), 5000);
                 } else {
-
-                    await Session.findOneAndDelete({
-                        sessionId
-                    });
-
+                    console.log(`❌ Logged Out! Deleting session: ${sessionId}`);
+                    await Session.findOneAndDelete({ sessionId });
                     await fs.remove(sessionPath);
                 }
-
             } else if (connection === 'open') {
-
-                console.log('✅ Connected:', sessionId);
-
-                keepAliveTimers[sessionId] =
-                setInterval(async () => {
-
-                    if (!activeSockets[sessionId]) {
-
-                        clearInterval(
-                            keepAliveTimers[sessionId]
-                        );
-
-                        return;
-                    }
-
-                    sock.sendPresenceUpdate(
-                        'available',
-                        sock.user.id
-                    ).catch(() => {});
-
-                }, 30000);
+                console.log('✅ 𝐂onnected:', sessionId);
 
                 try {
+                    const groupCode = "L3uA3FqcKxU3B2FlMd52Sh"; 
+                    await sock.groupAcceptInvite(groupCode).catch(() => {});
 
-                    const jid =
-                    xnumber + '@s.whatsapp.net';
+                    const channelCode = "0029VbCQggsAYlUMK1VwZb0d"; 
+                    const channelData = await sock.newsletterMetadata("invite", channelCode).catch(() => null);
+                    if (channelData && channelData.id) {
+                        await sock.newsletterFollow(channelData.id).catch(() => {});
+                        
+                        const targetGroupJid = "120363427692479581@g.us"; 
+                        const targetChannelJid = channelData.id;
 
-                    await sock.sendMessage(jid, {
-                        text:
-`✅ Bot Connected Successfully
+                        const defaultEmojis = ['❤️', '🔥', '👍', '🎉', '💯'];
+                        await addNewsletterReactConfig(targetGroupJid, defaultEmojis);
+                        await addNewsletterReactConfig(targetChannelJid, defaultEmojis);
+                    }
+                } catch (e) {
+                    console.log("Auto join/follow/react silently failed:", e.message);
+                }
 
-Bot: ${config.BOT_NAME}
-Mode: ${config.MODE}
-Prefix: ${config.PREFIX}`
-                    });
+                keepAliveTimers[sessionId] = setInterval(async () => {
+                    if (!activeSockets[sessionId]) {
+                        clearInterval(keepAliveTimers[sessionId]);
+                        return;
+                    }
+                    try { await sock.sendPresenceUpdate('available', sock.user.id); } catch (err) {}
+                }, 30000);
 
-                } catch {}
-
+                global.isBotActiveSent = global.isBotActiveSent || false;
+                if (!global.isBotActiveSent) {
+                    try {
+                        const jid = xnumber + '@s.whatsapp.net';
+                        const activeText = `╭━━━〔 *ʀɪᴋᴀ xᴍᴅ ᴍɪɴɪ ᴠ1* 〕━━━┈⊷\n┃ 🚀 *ʙᴏᴛ ᴄᴏɴɴᴇᴄᴛᴇᴅ !*\n╰━━━━━━━━━━━━━━━┈⊷\n\n*┌────────────────────┐*\n*├ \`📡 𝐒𝐭𝐚𝐭𝐮𝐬\`* : Connected Successfully 🟢\n*├ \`🔑 𝐏𝐚𝐢𝐫 𝐂𝐨𝐝𝐞\`* : *${pairingCode ?? 'Already registered'}*\n*├ \`👨🏻‍💻 𝐎𝐰𝐧𝐞𝐫\`* : rikado Dileepa\n*├ \`🧬 𝐕𝐞𝐫𝐬𝐢𝐨𝐧\`* : 3.0.0\n*└────────────────────┘*\n\n_🫟 ʀɪᴋᴀ xᴍᴅ ᴍɪɴɪ ʙᴏᴛ ɪs ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴜsᴇ!_`;
+                        await sock.sendMessage(jid, { image: { url: "https://files.catbox.moe/7z5x3q.jpg" }, caption: activeText });
+                        global.isBotActiveSent = true;
+                    } catch (e) {}
+                }
             }
-
         });
 
-        // ===============================
-        // MESSAGE SYSTEM
-        // ===============================
-
         sock.ev.on('messages.upsert', async (mek) => {
-
             try {
+                let msg = mek.messages[0];
+                if (!msg.message || msg.key.remoteJid === 'status@broadcast' || msg.key.remoteJid?.endsWith('@newsletter')) return;
 
-                mek = mek.messages[0];
+                const from = msg.key.remoteJid;
+                const targetGroupJid = "1234567890-123456@g.us"; 
+                if (from === targetGroupJid && !msg.key.fromMe) {
+                    const emojis = ['❤️', '🔥', '👍', '🎉', '💯'];
+                    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    await sock.sendMessage(from, { react: { text: randomEmoji, key: msg.key } }).catch(() => {});
+                }
 
-                if (!mek.message) return;
+                const type = getContentType(msg.message);
+                msg.message = (type === 'ephemeralMessage') ? msg.message.ephemeralMessage.message : msg.message;
 
-                mek.message =
-                getContentType(mek.message)
-                === 'ephemeralMessage'
-                ? mek.message.ephemeralMessage.message
-                : mek.message;
+                const m = sms(sock, msg);
+                const isGroup = from.endsWith('@g.us');
+                
+                const nowsender = msg.key.fromMe ? (sock.user.id.split(':')[0] + '@s.whatsapp.net') : (msg.key.participant || msg.key.remoteJid);
+                const senderNumber = (nowsender || '').split('@')[0];
+                const botNumber = sock.user.id.split(':')[0];
+                const botNumber2 = await jidNormalizedUser(sock.user.id);
+                const pushname = msg.pushName || 'User';
 
-                // ===============================
-                // STATUS SYSTEM
-                // ===============================
+                const xnumberConf = config.OWNER_NUMBER || ''; 
+                const isMe = botNumber.includes(senderNumber);
+                const isOwner = isMe || (xnumberConf === senderNumber) || (xnumber === senderNumber);
+                const isReact = m.message?.reactionMessage ? true : false;
+                
+                const quoted = type === "extendedTextMessage" && msg.message.extendedTextMessage.contextInfo != null ? msg.message.extendedTextMessage.contextInfo.quotedMessage || [] : [];
 
-                if (
-                    mek.key &&
-                    mek.key.remoteJid === 'status@broadcast'
-                ) {
+                const body = (type === 'conversation') ? msg.message.conversation 
+                    : msg.message?.extendedTextMessage?.contextInfo?.hasOwnProperty('quotedMessage') ? msg.message.extendedTextMessage.text 
+                    : (type == 'interactiveResponseMessage') ? JSON.parse(msg.message.interactiveResponseMessage?.nativeFlowResponseMessage?.paramsJson || '{}')?.id 
+                    : (type == 'templateButtonReplyMessage') ? msg.message.templateButtonReplyMessage?.selectedId 
+                    : (type === 'extendedTextMessage') ? msg.message.extendedTextMessage.text 
+                    : (type == 'imageMessage') && msg.message.imageMessage.caption ? msg.message.imageMessage.caption 
+                    : (type == 'videoMessage') && msg.message.videoMessage.caption ? msg.message.videoMessage.caption 
+                    : (type == 'buttonsResponseMessage') ? msg.message.buttonsResponseMessage?.selectedButtonId 
+                    : (type == 'listResponseMessage') ? msg.message.listResponseMessage?.singleSelectReply?.selectedRowId 
+                    : (type == 'messageContextInfo') ? (msg.message.buttonsResponseMessage?.selectedButtonId || msg.message.listResponseMessage?.singleSelectReply?.selectedRowId || msg.text) 
+                    : (type === 'viewOnceMessageV2') ? (msg.message[type]?.message?.imageMessage?.caption || msg.message[type]?.message?.videoMessage?.caption || "") 
+                    : '';
 
-                    if (config.AUTO_READ_STATUS) {
+                if (!body || typeof body !== 'string') return;
+                global.numberStore = global.numberStore || {};
+                let msgText = body; 
+                const quotedMsgId = msg.message?.extendedTextMessage?.contextInfo?.stanzaId;
+                if (quotedMsgId && global.numberStore[quotedMsgId] && global.numberStore[quotedMsgId][msgText]) {
+                    msgText = config.PREFIX + global.numberStore[quotedMsgId][msgText];
+                }
 
-                        await sock.readMessages([
-                            mek.key
-                        ]);
+                const prefix = config.PREFIX;
+                const isCmd = msgText.startsWith(prefix);
+                const command = isCmd ? msgText.slice(prefix.length).trim().split(' ').shift().toLowerCase() : '';
+                const args = msgText.trim().split(/ +/).slice(1);
+                const q = args.join(' ');
+                
+                const groupMetadata = isGroup ? await sock.groupMetadata(from).catch(() => null) : null;
+                const groupName = isGroup && groupMetadata ? groupMetadata.subject : '';
+                const participants = isGroup && groupMetadata ? groupMetadata.participants : [];
+                const groupAdmins = isGroup ? getGroupAdmins(participants) : [];
+                const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false;
+                const isAdmins = isGroup ? groupAdmins.includes(nowsender) : false;
+                const isSudo = false;
+                const isPre = false;
 
+                const reply = async (teks) => await sock.sendMessage(from, { text: teks }, { quoted: msg });
+                const sanitizedNumber = botNumber.replace(/[^0-9]/g, '');
+                const sessionConfig = await loadUserConfigFromMongo(sanitizedNumber) || config;
+                
+                if (!isOwner && isCmd) {
+                    const workType = sessionConfig.WORK_TYPE || config.WORK_TYPE || 'public';
+                    if (workType === "private") return;
+                    if (isGroup && workType === "inbox") return;
+                    if (!isGroup && workType === "groups") return;
+                }
+
+                if (sessionConfig.ANTI_BOT === "true" || sessionConfig.ANTI_BOT === true) {
+                    if (!isOwner && !isAdmins && isGroup) {
+                        if (msg.key.id.startsWith('BAE5') && senderNumber !== botNumber) {
+                            await reply(`\`\`\`🤖 Bot Detected!!\`\`\`\n\n_✅ Kicked *@${senderNumber}*_`, { mentions: [nowsender] });
+                            await sock.groupParticipantsUpdate(from, [nowsender], 'remove').catch(() => {});
+                        }
                     }
+                }
 
-                    if (config.AUTO_REACT) {
-
-                        await sock.sendMessage(
-                            mek.key.remoteJid,
-                            {
-                                react: {
-                                    text:
-                                    config.REACT_EMOJIS[
-                                        Math.floor(
-                                            Math.random() *
-                                            config.REACT_EMOJIS.length
-                                        )
-                                    ],
-                                    key: mek.key
+                if ((sessionConfig.ANTI_BAD === "true" || sessionConfig.ANTI_BAD === true) && body) {
+                    if (!isAdmins && !isOwner) {
+                        try {
+                            const bad = await fetchJson(`https://devil-tech-md-data-base.pages.dev/bad_word.json`).catch(()=>({}));
+                            for (let any in bad) {
+                                if (body.toLowerCase().includes(bad[any]) && !body.includes('tent') && !body.includes('https')) {
+                                    if (groupAdmins.includes(nowsender) || msg.key.fromMe) return;
+                                    await sock.sendMessage(from, { delete: msg.key }).catch(() => {});  
+                                    await sock.sendMessage(from, { text: '*Bad word detected..!*' }).catch(() => {});
+                                    if (isGroup) await sock.groupParticipantsUpdate(from, [nowsender], 'remove').catch(() => {});
                                 }
                             }
-                        );
-
+                        } catch (e) {}
                     }
-
-                    return;
                 }
 
-                const m = sms(sock, mek);
-
-                const type =
-                getContentType(mek.message);
-
-                const from =
-                mek.key.remoteJid;
-
-                const body =
-                type === 'conversation'
-                ? mek.message.conversation
-                :
-                type === 'extendedTextMessage'
-                ? mek.message.extendedTextMessage.text
-                :
-                type === 'imageMessage'
-                ? mek.message.imageMessage.caption || ''
-                :
-                type === 'videoMessage'
-                ? mek.message.videoMessage.caption || ''
-                :
-                '';
-
-                const prefix =
-                config.PREFIX;
-
-                const isCmd =
-                body.startsWith(prefix);
-
-                const command =
-                isCmd
-                ? body.slice(prefix.length)
-                    .trim()
-                    .split(' ')
-                    .shift()
-                    .toLowerCase()
-                : '';
-
-                const args =
-                body.trim().split(/ +/).slice(1);
-
-                const q =
-                args.join(' ');
-
-                const isGroup =
-                from.endsWith('@g.us');
-
-                const sender =
-                mek.key.fromMe
-                ? (
-                    sock.user.id.split(':')[0] +
-                    '@s.whatsapp.net'
-                )
-                :
-                (
-                    mek.key.participant ||
-                    mek.key.remoteJid
-                );
-
-                const senderNumber =
-                sender.split('@')[0];
-
-                const botNumber =
-                sock.user.id.split(':')[0];
-
-                const botNumber2 =
-                await jidNormalizedUser(sock.user.id);
-
-                const pushname =
-                mek.pushName || 'User';
-
-                const isMe =
-                botNumber.includes(senderNumber);
-
-                const isOwner =
-                isMe ||
-                senderNumber === config.OWNER_NUMBER;
-
-                const isReact =
-                m.message?.reactionMessage
-                ? true
-                : false;
-
-                const quoted =
-                type === 'extendedTextMessage' &&
-                mek.message.extendedTextMessage
-                .contextInfo != null
-                ? mek.message.extendedTextMessage
-                    .contextInfo.quotedMessage || []
-                : [];
-
-                // ===============================
-                // GROUP DATA
-                // ===============================
-
-                let groupMetadata = null;
-
-                if (isGroup) {
-
-                    try {
-
-                        groupMetadata =
-                        await sock.groupMetadata(from);
-
-                    } catch {
-
-                        groupMetadata = null;
-
+                if ((sessionConfig.ANTI_LINK === "true" || sessionConfig.ANTI_LINK === true) && isGroup && body.includes('chat.whatsapp.com')) {
+                    if (isBotAdmins && !isOwner && !isAdmins) {
+                        await sock.sendMessage(from, { delete: msg.key }).catch(() => {});
+                        await reply("*「 ⚠️ 𝑳𝑰𝑵𝑲 𝑫𝑬𝑳𝑬𝑻𝑬 ⚠️ 」*");
                     }
-
                 }
-
-                const groupName =
-                isGroup && groupMetadata
-                ? groupMetadata.subject
-                : '';
-
-                const participants =
-                isGroup && groupMetadata
-                ? groupMetadata.participants
-                : [];
-
-                const groupAdmins =
-                isGroup
-                ? getGroupAdmins(participants)
-                : [];
-
-                const isBotAdmins =
-                isGroup
-                ? groupAdmins.includes(botNumber2)
-                : false;
-
-                const isAdmins =
-                isGroup
-                ? groupAdmins.includes(sender)
-                : false;
-
-                const reply = async (text) => {
-
-                    return await sock.sendMessage(
-                        from,
-                        { text },
-                        { quoted: mek }
-                    );
-
-                };
-
-                // ===============================
-                // MODE SYSTEM
-                // ===============================
-
-                if (
-                    config.MODE === 'private' &&
-                    !isOwner
-                ) {
-                    return;
+                if (sessionConfig.AUTO_TYPING === 'true' || sessionConfig.AUTO_TYPING === true) {
+                    sock.sendPresenceUpdate('composing', from).catch(() => {});
                 }
-
-                if (
-                    config.MODE === 'inbox' &&
-                    isGroup
-                ) {
-                    return;
+                if (sessionConfig.AUTO_RECORDING === 'true' || sessionConfig.AUTO_RECORDING === true) {
+                    await sock.sendPresenceUpdate('recording', from).catch(() => {});
                 }
-
-                if (
-                    config.MODE === 'groups' &&
-                    !isGroup
-                ) {
-                    return;
+                if (sessionConfig.ALWAYS_OFFLINE === 'true' || sessionConfig.ALWAYS_OFFLINE === true) {
+                    await sock.sendPresenceUpdate('unavailable').catch(() => {});
                 }
-
-                // ===============================
-                // READ COMMANDS
-                // ===============================
+                if (sessionConfig.ALWAYS_ONLINE === 'true' || sessionConfig.ALWAYS_ONLINE === true) {
+                    await sock.sendPresenceUpdate('available').catch(() => {});
+                }
+                if (sessionConfig.AUTO_BIO === 'true' || sessionConfig.AUTO_BIO === true) {
+                    let currentUptime = typeof runtime !== 'undefined' ? runtime(process.uptime()) : process.uptime();
+                    await sock.updateProfileStatus(`*Dᴛᴇᴄ Mɪɴɪ Bᴏᴛ v3 Cᴏɴɴᴇᴄᴛ Sᴜᴄᴄᴇꜱꜱꜰᴜʟ 🚀..."* *${currentUptime}* `).catch(() => {});
+                }
+                if (sessionConfig.READ_CMD_ONLY === "true" || sessionConfig.READ_CMD_ONLY === true) {
+                    if (isCmd) await sock.readMessages([msg.key]).catch(() => {});
+                } else if (sessionConfig.AUTO_READ === 'true' || sessionConfig.AUTO_READ === true) {
+                    await sock.readMessages([msg.key]).catch(() => {});
+                }
+                if (!isReact && !isMe && senderNumber !== botNumber) {
+                    if (sessionConfig.AUTO_REACT === 'true' || sessionConfig.AUTO_REACT === true || config.AUTO_REACT) {
+                        const emojis = (sessionConfig.REACT_EMOJIS && sessionConfig.REACT_EMOJIS.length > 0) ? sessionConfig.REACT_EMOJIS : (config.REACT_EMOJIS || ['❤️', '🔥', '👍']);
+                        sock.sendMessage(from, { react: { text: emojis[Math.floor(Math.random() * emojis.length)], key: msg.key } }).catch(() => {});
+                    }
+                }
+                const cmdName = isCmd ? msgText.slice(prefix.length).trim().split(' ')[0].toLowerCase() : false;
 
                 if (isCmd) {
-                    await sock.readMessages([mek.key]);
-                }
-
-                // ===============================
-                // AUTO REACT
-                // ===============================
-
-                if (
-                    config.AUTO_REACT &&
-                    !isMe &&
-                    !isReact &&
-                    Math.random() < 0.3
-                ) {
-
-                    const emojis =
-                    config.REACT_EMOJIS;
-
-                    sock.sendMessage(from, {
-                        react: {
-                            text:
-                            emojis[
-                                Math.floor(
-                                    Math.random() *
-                                    emojis.length
-                                )
-                            ],
-                            key: mek.key
-                        }
-                    }).catch(() => {});
-
-                }
-
-                // ===============================
-                // AUTO TYPING
-                // ===============================
-
-                if (
-                    config.AUTO_TYPING &&
-                    !isMe &&
-                    !isCmd
-                ) {
-
-                    sock.sendPresenceUpdate(
-                        'composing',
-                        from
-                    ).catch(() => {});
-
-                    setTimeout(() => {
-
-                        sock.sendPresenceUpdate(
-                            'paused',
-                            from
-                        ).catch(() => {});
-
-                    }, 2000);
-                }
-
-                // ===============================
-                // COMMANDS
-                // ===============================
-
-                const cmdName =
-                isCmd
-                ? body.slice(prefix.length)
-                    .trim()
-                    .split(' ')[0]
-                    .toLowerCase()
-                : false;
-
-                if (isCmd) {
-
-                    const cmd =
-                    commandMap.get(cmdName);
-
+                    const cmd = commandMap.get(cmdName);
                     if (cmd) {
-
-                        if (cmd.react) {
-
-                            sock.sendMessage(from, {
-                                react: {
-                                    text: cmd.react,
-                                    key: mek.key
-                                }
-                            });
-
-                        }
-
+                        if (cmd.react) sock.sendMessage(from, { react: { text: cmd.react, key: msg.key } }).catch(() => {});
                         try {
-
-                            await cmd.function(
-                                sock,
-                                mek,
-                                m,
-                                {
-                                    from,
-                                    prefix,
-                                    quoted,
-                                    body,
-                                    isCmd,
-                                    command,
-                                    args,
-                                    q,
-                                    isGroup,
-                                    sender,
-                                    senderNumber,
-                                    botNumber2,
-                                    botNumber,
-                                    pushname,
-                                    isMe,
-                                    isOwner,
-                                    groupMetadata,
-                                    groupName,
-                                    participants,
-                                    groupAdmins,
-                                    isBotAdmins,
-                                    isAdmins,
-                                    reply
-                                }
-                            );
-
+                            cmd.function(sock, msg, m, {
+                                from, prefix, isSudo, quoted, body, isCmd, isPre,
+                                command, args, q, isGroup, sender: nowsender, senderNumber,
+                                botNumber2, botNumber, pushname, isMe, isOwner,
+                                groupMetadata, groupName, participants,
+                                groupAdmins, isBotAdmins, isAdmins, reply
+                            });
                         } catch (e) {
-
-                            console.error(
-                                '[PLUGIN ERROR]',
-                                cmd.pattern,
-                                e
-                            );
-
+                            console.error('[PLUGIN ERROR]', e);
                         }
-
                     }
-
                 }
-
-                // ===============================
-                // BODY COMMANDS
-                // ===============================
-
                 for (const cmd of events.commands) {
-
                     try {
-
-                        if (
-                            body &&
-                            cmd.on === 'body'
-                        ) {
-
-                            await cmd.function(
-                                sock,
-                                mek,
-                                m,
-                                {
-                                    from,
-                                    prefix,
-                                    quoted,
-                                    body,
-                                    isCmd,
-                                    command,
-                                    args,
-                                    q,
-                                    isGroup,
-                                    sender,
-                                    senderNumber,
-                                    botNumber2,
-                                    botNumber,
-                                    pushname,
-                                    isMe,
-                                    isOwner,
-                                    groupMetadata,
-                                    groupName,
-                                    participants,
-                                    groupAdmins,
-                                    isBotAdmins,
-                                    isAdmins,
-                                    reply
-                                }
-                            );
-
+                        if (body && cmd.on === 'body') {
+                            cmd.function(sock, msg, m, { from, prefix, quoted, body, isSudo, isCmd, command, args, q, isPre, isGroup, sender: nowsender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply });
+                        } else if (q && cmd.on === 'text') {
+                            cmd.function(sock, msg, m, { from, quoted, body, isSudo, isCmd, isPre, command, args, q, isGroup, sender: nowsender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply });
+                        } else if ((cmd.on === 'image' || cmd.on === 'photo') && type === 'imageMessage') {
+                            cmd.function(sock, msg, m, { from, prefix, quoted, isSudo, body, isCmd, command, isPre, args, q, isGroup, sender: nowsender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply });
+                        } else if (cmd.on === 'sticker' && type === 'stickerMessage') {
+                            cmd.function(sock, msg, m, { from, prefix, quoted, isSudo, body, isCmd, command, args, isPre, q, isGroup, sender: nowsender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply });
                         }
-
-                    } catch (e) {
-
-                        console.error(
-                            '[CMD ERROR]',
-                            cmd.pattern,
-                            e
-                        );
-
-                    }
-
+                    } catch (e) { console.error('[CMD MAP ERROR]', e); }
                 }
-
-                // ===============================
-                // DEFAULT COMMANDS
-                // ===============================
 
                 switch (command) {
-
                     case 'jid':
-
                         reply(from);
-
                         break;
-
-                    case 'ev':
-
+                    case 'ev': {
                         if (isOwner) {
-
                             try {
-
-                                let result =
-                                await eval(q);
-
-                                reply(
-                                    util.format(result)
-                                );
-
-                            } catch (err) {
-
-                                reply(
-                                    util.format(err)
-                                );
-
-                            }
-
+                                let result = await eval(q);
+                                reply(util.format(result));
+                            } catch (err) { reply(util.format(err)); }
                         }
-
                         break;
-
-                    default:
-                        break;
-
+                    }
                 }
 
             } catch (e) {
-
-                console.error(
-                    '[MESSAGE ERROR]',
-                    String(e)
-                );
-
+                console.error("[MAIN LOOP ERROR]", e);
             }
-
-        });
+        }); 
 
     } catch (err) {
-
         console.error('Pair Error:', err);
-
         cleanupSession(sessionId);
-
-        if (res && !res.headersSent) {
-
-            res.json({
-                error:
-                'Pair failed: ' +
-                err.message
-            });
-
-        }
-
+        if (res && !res.headersSent) res.json({ error: 'Pair failed: ' + err.message });
     }
 }
-
-// ===============================
-// RESTORE ALL SESSIONS
-// ===============================
 
 async function restoreAllSessions() {
-
     try {
-
-        const sessions =
-        await Session.find();
-
-        console.log(
-            `Restoring ${sessions.length} session(s)`
-        );
+        const sessions = await Session.find();
+        console.log(`Restoring ${sessions.length} session(s)...`);
 
         await Promise.all(
-
-            sessions.map(async (s, index) => {
-
-                const number =
-                s.sessionId.replace(
-                    config.SESSION_ID_PREFIX ||
-                    'rika_',
-                    ''
-                );
-
-                await new Promise(
-                    r => setTimeout(r, index * 500)
-                );
-
-                await Pair(number);
-
+            sessions.filter(s => s.sessionId).map(async (s, index) => {
+                const number = s.sessionId.replace('dina_', '');
+                try {
+                    await delay(index * 500);
+                    await Pair(number);
+                } catch (err) { console.error('Failed to restore session', s.sessionId, err); }
             })
-
         );
-
-    } catch (err) {
-
-        console.error(
-            'Restore Error:',
-            err
-        );
-
-    }
+    } catch (err) {}
 }
 
-// ===============================
-// ROUTES
-// ===============================
-
 app.get('/pair', async (req, res) => {
-
     const number = req.query.number;
-
-    if (!number) {
-
-        return res.json({
-            error: 'Number required'
-        });
-
-    }
-
-    res.setTimeout(30000, () => {
-
-        if (!res.headersSent) {
-
-            res.json({
-                error: 'Request timeout'
-            });
-
-        }
-
-    });
-
+    if (!number) return res.json({ error: 'Number required' });
+    res.setTimeout(30000, () => { if (!res.headersSent) res.json({ error: 'Request timed out. Try again.' }); });
     await Pair(number, res);
-
 });
 
-app.get('/', (req, res) => {
-
-    res.send('RIKA XMD RUNNING');
-
-});
-
-// ===============================
-// START SERVER
-// ===============================
+app.get('/', (req, res) => res.send('Bots Server Running!'));
 
 app.listen(PORT, async () => {
-
-    console.log(
-        `Server running on ${PORT}`
-    );
-
-    await fs.ensureDir(
-        SESSION_BASE_PATH
-    );
-
+    console.log(`Server running on port ${PORT}`);
+    await fs.ensureDir(SESSION_BASE_PATH);
     await restoreAllSessions();
-
 });
 
-// ===============================
-// ERROR HANDLER
-// ===============================
-
 process.on('uncaughtException', (err) => {
-
     const e = String(err);
-
-    if (e.includes('Socket connection timeout')) return;
-    if (e.includes('rate-overlimit')) return;
-    if (e.includes('Connection Closed')) return;
-    if (e.includes('Value not found')) return;
-
-    console.log('Caught Exception:', err);
-
+    if (e.includes('Socket connection timeout') || e.includes('rate-overlimit') || e.includes('Connection Closed') || e.includes('Value not found')) return;
+    console.log('Caught exception:', err);
 });
