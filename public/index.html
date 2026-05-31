@@ -1,652 +1,494 @@
 <!DOCTYPE html>
 <html lang="si">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RIKA FREE BOT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIKA XMD— MINI V1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0f0a;
+            --surface: #111811;
+            --border: #1e2e1e;
+            --green: #00e676;
+            --green-dim: #00c853;
+            --green-glow: rgba(0, 230, 118, 0.15);
+            --green-glow-strong: rgba(0, 230, 118, 0.3);
+            --text: #e8f5e9;
+            --muted: #4a6a4a;
+            --error: #ff5252;
+            --error-glow: rgba(255, 82, 82, 0.15);
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+        * {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+        }
 
-<style>
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
 
-:root{
-    --bg:#050505;
-    --surface:#0d0d0d;
-    --border:#1a1a1a;
-    --neon:#00f2ff;
-    --neon-glow:rgba(0,242,255,0.5);
-    --text:#ffffff;
-    --muted:#888888;
-    --error:#ff3e3e;
-}
+        /* Animated grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 48px 48px;
+            opacity: 0.5;
+            z-index: 0;
+        }
 
-body.light-mode{
-    --bg:#ffffff;
-    --surface:#f5f5f5;
-    --border:#dddddd;
-    --neon:#000000;
-    --neon-glow:rgba(0,0,0,0.2);
-    --text:#000000;
-    --muted:#666666;
-}
+        /* Corner glow */
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -150px;
+            right: -150px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+        }
 
-body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Inter',sans-serif;
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-    transition:0.5s;
-}
+        /* Header */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 36px;
+        }
 
-.bg-animate{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:-1;
-    overflow:hidden;
-}
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--green);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--green-glow-strong);
+            flex-shrink: 0;
+        }
 
-.blob{
-    position:absolute;
-    width:300px;
-    height:300px;
-    background:var(--neon);
-    filter:blur(90px);
-    border-radius:50%;
-    opacity:0.08;
-    animation:move 20s infinite alternate;
-}
+        .brand-icon svg {
+            width: 26px;
+            height: 26px;
+            fill: #0a0f0a;
+        }
 
-@keyframes move{
-    from{
-        transform:translate(-10%,-10%);
-    }
-    to{
-        transform:translate(110%,110%);
-    }
-}
+        .brand-text h1 {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
 
-.container{
-    width:100%;
-    max-width:430px;
-    padding:20px;
-}
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
 
-.brand{
-    text-align:center;
-    margin-bottom:35px;
-}
+        /* Card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
 
-.brand h1{
-    font-size:1.7rem;
-    letter-spacing:5px;
-    color:var(--neon);
-    font-family:'JetBrains Mono',monospace;
-    text-shadow:0 0 15px var(--neon-glow);
-    animation:flicker 3s infinite;
-}
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--green), transparent);
+            opacity: 0.6;
+        }
 
-@keyframes flicker{
-    0%,18%,22%,25%,53%,57%,100%{
-        text-shadow:0 0 15px var(--neon-glow);
-    }
-    20%,24%,55%{
-        text-shadow:none;
-        opacity:0.8;
-    }
-}
+        .card-label {
+            font-size: 0.7rem;
+            font-family: 'Space Mono', monospace;
+            color: var(--muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
 
-.card{
-    background:var(--surface);
-    border:1px solid var(--border);
-    border-radius:15px;
-    padding:35px 25px;
-    box-shadow:0 20px 50px rgba(0,0,0,0.5);
-}
+        /* Input group */
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            margin-bottom: 14px;
+        }
 
-.card:focus-within{
-    border-color:var(--neon);
-    box-shadow:0 0 30px rgba(0,242,255,0.15);
-}
+        .input-group:focus-within {
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px var(--green-glow);
+        }
 
-.label{
-    font-size:0.75rem;
-    color:var(--neon);
-    margin-bottom:20px;
-    display:block;
-    letter-spacing:1px;
-    font-family:'JetBrains Mono',monospace;
-}
+        .input-prefix {
+            padding: 0 14px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--muted);
+            border-right: 1px solid var(--border);
+            height: 48px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
 
-.input-wrapper{
-    margin-bottom:25px;
-}
+        input[type="tel"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            padding: 0 14px;
+            height: 48px;
+            letter-spacing: 1px;
+        }
 
-input{
-    width:100%;
-    background:rgba(255,255,255,0.03);
-    border:1px solid var(--border);
-    border-radius:8px;
-    color:var(--text);
-    font-family:'JetBrains Mono',monospace;
-    font-size:1rem;
-    padding:15px;
-    outline:none;
-    transition:0.3s;
-}
+        input[type="tel"]::placeholder {
+            color: var(--muted);
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0;
+            font-size: 0.875rem;
+        }
 
-input:focus{
-    border-color:var(--neon);
-}
+        /* Button */
+        .btn {
+            width: 100%;
+            height: 48px;
+            background: var(--green);
+            border: none;
+            border-radius: 10px;
+            color: #0a0f0a;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
 
-.btn{
-    width:100%;
-    background:var(--neon);
-    color:#000;
-    border:none;
-    padding:17px;
-    border-radius:8px;
-    font-family:'JetBrains Mono',monospace;
-    font-weight:800;
-    cursor:pointer;
-    transition:0.3s;
-}
+        .btn:hover:not(:disabled) {
+            box-shadow: 0 0 24px var(--green-glow-strong);
+            transform: translateY(-1px);
+        }
 
-.btn:hover{
-    transform:translateY(-3px);
-    box-shadow:0 10px 20px var(--neon-glow);
-}
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
 
-.result{
-    margin-top:25px;
-    display:none;
-}
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-.result.show{
-    display:block;
-    animation:fade 0.4s ease;
-}
+        .btn .btn-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
 
-@keyframes fade{
-    from{
-        opacity:0;
-        transform:translateY(20px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
+        /* Spinner */
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(10,15,10,0.3);
+            border-top-color: #0a0f0a;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
 
-.code-display{
-    background:rgba(0,242,255,0.05);
-    border:1px dashed var(--neon);
-    border-radius:8px;
-    padding:25px;
-    text-align:center;
-}
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
-.code-text{
-    font-size:2rem;
-    letter-spacing:8px;
-    color:var(--neon);
-    font-family:'JetBrains Mono',monospace;
-    font-weight:700;
-}
+        /* Result area */
+        .result {
+            margin-top: 20px;
+            display: none;
+        }
 
-.copy-link{
-    font-size:0.7rem;
-    margin-top:15px;
-    color:var(--muted);
-    cursor:pointer;
-}
+        .result.show {
+            display: block;
+            animation: fadeUp 0.4s ease;
+        }
 
-.copy-link:hover{
-    color:var(--neon);
-}
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
-.footer{
-    text-align:center;
-    margin-top:35px;
-    font-size:0.65rem;
-    color:var(--muted);
-    letter-spacing:4px;
-}
+        /* Code display */
+        .code-box {
+            background: var(--bg);
+            border: 1px solid var(--green);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 32px var(--green-glow);
+        }
 
-.floating-controls{
-    position:fixed;
-    top:20px;
-    right:20px;
-    display:flex;
-    gap:10px;
-}
+        .code-label {
+            font-size: 0.65rem;
+            font-family: 'Space Mono', monospace;
+            color: var(--muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
 
-.f-btn{
-    background:var(--surface);
-    border:1px solid var(--border);
-    color:var(--text);
-    padding:10px 15px;
-    border-radius:50px;
-    cursor:pointer;
-}
+        .code-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--green);
+            letter-spacing: 6px;
+            text-shadow: 0 0 24px var(--green-glow-strong);
+            word-break: break-all;
+        }
 
-.f-btn:hover{
-    border-color:var(--neon);
-    color:var(--neon);
-}
+        .copy-btn {
+            margin-top: 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--muted);
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 1px;
+        }
 
-.loader{
-    width:18px;
-    height:18px;
-    border:3px solid #000;
-    border-top:3px solid transparent;
-    border-radius:50%;
-    animation:spin 0.8s linear infinite;
-    margin:auto;
-}
+        .copy-btn:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
 
-@keyframes spin{
-    to{
-        transform:rotate(360deg);
-    }
-}
+        .copy-btn.copied {
+            border-color: var(--green);
+            color: var(--green);
+        }
 
-.status-box{
-    padding:15px;
-    border-radius:8px;
-    margin-bottom:15px;
-    font-size:0.8rem;
-    font-family:'JetBrains Mono',monospace;
-}
+        /* Instructions */
+        .instructions {
+            margin-top: 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
 
-.online{
-    border:1px solid #00ff99;
-    color:#00ff99;
-    background:rgba(0,255,100,0.1);
-}
+        .instructions p {
+            font-size: 0.78rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
 
-.offline{
-    border:1px solid red;
-    color:red;
-    background:rgba(255,0,0,0.1);
-}
+        .instructions p span {
+            color: var(--green);
+            font-family: 'Space Mono', monospace;
+        }
 
-</style>
+        /* Error */
+        .error-box {
+            background: var(--error-glow);
+            border: 1px solid var(--error);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 0.82rem;
+            color: var(--error);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Pulse dot */
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%        { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-family: 'Space Mono', monospace;
+        }
+    </style>
 </head>
-
 <body>
-
-<div class="bg-animate">
-<div class="blob"></div>
-</div>
-
-<div class="floating-controls">
-<button class="f-btn" onclick="toggleMusic()" id="mBtn">MUSIC OFF 🎵</button>
-<button class="f-btn" onclick="toggleTheme()">MODE 🌓</button>
-</div>
-
-<audio id="bgMusic" loop>
-<source src="https://files.catbox.moe/srf3p5.mp3" type="audio/mpeg">
-</audio>
-
 <div class="container">
 
-<div class="brand">
-<h1>𝐑𝐈𝐊𝐀 𝐅𝐑𝐄𝐄 𝐌𝐈𝐍𝐈 𝐁𝐎𝐓</h1>
+    <div class="brand">
+        <div class="brand-icon">
+            <!-- WhatsApp-like icon -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.41A9.956 9.956 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 01-4.078-1.117l-.292-.174-3.037.86.862-3.123-.191-.305A8 8 0 1112 20zm4.406-5.845c-.241-.121-1.428-.705-1.65-.786-.22-.081-.38-.121-.54.122-.16.242-.62.785-.76.946-.14.16-.28.18-.52.06-.241-.12-1.018-.375-1.939-1.198-.717-.64-1.201-1.43-1.342-1.672-.14-.242-.015-.373.105-.493.108-.108.24-.283.362-.424.12-.142.16-.243.24-.404.08-.161.04-.303-.02-.424-.06-.12-.54-1.303-.74-1.784-.195-.468-.392-.404-.54-.412l-.46-.008c-.16 0-.42.06-.64.303-.22.242-.84.822-.84 2.003 0 1.18.86 2.322.98 2.483.12.16 1.693 2.585 4.103 3.625.573.247 1.02.395 1.368.505.575.183 1.098.157 1.512.095.461-.069 1.42-.58 1.62-1.14.2-.562.2-1.043.14-1.143-.06-.1-.22-.16-.46-.282z"/>
+            </svg>
+        </div>
+        <div class="brand-text">
+            <h1>DTEC MINI V3</h1>
+            <p><span class="pulse-dot"></span>Pairing System</p>
+        </div>
+    </div>
 
-<div style="font-size:0.65rem;color:var(--muted);margin-top:10px;">
-● RIKA TEACH XMD MINI BOT ⚡
-</div>
-</div>
+    <div class="card">
+        <div class="card-label">// connect device</div>
 
-<div class="card">
+        <div class="input-group">
+            <div class="input-prefix">+</div>
+            <input
+                type="tel"
+                id="phoneInput"
+                placeholder="94XXXXXXXXX (country code + number)"
+                maxlength="20"
+            />
+        </div>
 
-<label class="label">
-01. ENTER PHONE NUMBER
-</label>
+        <button class="btn" id="pairBtn" onclick="getPairingCode()">
+            <div class="btn-inner" id="btnContent">
+                <span>GET PAIRING CODE</span>
+            </div>
+        </button>
 
-<div class="input-wrapper">
-<input type="tel" id="phoneInput" placeholder="947XXXXXXXX">
-</div>
+        <div class="result" id="result"></div>
+    </div>
 
-<button class="btn" id="pairBtn" onclick="getPairingCode()">
-<span id="btnText">GET PAIRING CODE</span>
-</button>
-
-<div class="result" id="result"></div>
-
-<div style="margin-top:20px;">
-<button class="btn"
-onclick="openOwnerPanel()"
-style="
-background:#111;
-color:var(--neon);
-border:1px solid var(--neon);
-">
-OWNER PANEL 🔐
-</button>
-</div>
-
-<div class="result" id="ownerLoginBox">
-
-<div class="code-display">
-
-<input type="password"
-id="ownerPassword"
-placeholder="ENTER OWNER PASSWORD"
-style="
-margin-bottom:15px;
-">
-
-<button class="btn" onclick="checkOwnerPassword()">
-LOGIN OWNER PANEL
-</button>
-
-</div>
-</div>
-
-<div class="result" id="ownerPanel">
-
-<div class="code-display">
-
-<h2 style="
-color:var(--neon);
-margin-bottom:20px;
-font-family:'JetBrains Mono',monospace;
-">
-BOT CONTROL PANEL ⚡
-</h2>
-
-<div id="botStatus"
-class="status-box online">
-BOT STATUS : ACTIVE ✅
-</div>
-
-<div id="connectedNumbers"
-style="
-text-align:left;
-font-size:0.8rem;
-background:#111;
-padding:15px;
-border-radius:8px;
-border:1px solid var(--border);
-margin-bottom:15px;
-">
-CONNECTED NUMBERS:<br><br>
-NO DEVICES
-</div>
-
-<div id="totalUsers"
-style="
-margin-bottom:15px;
-font-size:0.8rem;
-color:var(--neon);
-font-family:'JetBrains Mono',monospace;
-">
-TOTAL USERS : 0
-</div>
-
-<button class="btn"
-onclick="refreshBotStatus()">
-REFRESH STATUS 🔄
-</button>
-
-<button class="btn"
-onclick="logoutPanel()"
-style="
-margin-top:10px;
-background:red;
-color:white;
-">
-LOGOUT ❌
-</button>
-
-</div>
-</div>
-
-</div>
-
-<div class="footer">
-POWERED BY SHAMIKA DENUWAN
-</div>
-
+    <div class="footer">POWERD BY SHAMIKA DENUWAN&nbsp;/&nbsp; RIKA TEACH FREE</div>
 </div>
 
 <script>
+    // Allow Enter key
+    document.getElementById('phoneInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') getPairingCode();
+    });
 
-async function getPairingCode(){
+    async function getPairingCode() {
+        const input = document.getElementById('phoneInput');
+        const btn = document.getElementById('pairBtn');
+        const btnContent = document.getElementById('btnContent');
+        const resultDiv = document.getElementById('result');
 
-    const input=document.getElementById('phoneInput');
-    const btn=document.getElementById('pairBtn');
-    const btnText=document.getElementById('btnText');
-    const resultDiv=document.getElementById('result');
+        const number = input.value.trim().replace(/[^0-9]/g, '');
 
-    const number=input.value.trim().replace(/[^0-9]/g,'');
-
-    if(number.length < 7){
-        showError('INVALID NUMBER ❌');
-        return;
-    }
-
-    btn.disabled=true;
-    btnText.innerHTML='<div class="loader"></div>';
-
-    try{
-
-        const response=await fetch(`/pair?number=${number}`);
-        const data=await response.json();
-
-        if(data.code){
-            showCode(data.code);
-        }else{
-            showError(data.error || 'SERVER ERROR');
+        if (!number || number.length < 7) {
+            showError('ℹ️ Valid phone number ekak denna.', resultDiv);
+            return;
         }
 
-    }catch(err){
-
-        showError('SERVER OFFLINE ❌');
-
-    }finally{
-
-        btn.disabled=false;
-        btnText.innerHTML='GET PAIRING CODE';
-
-    }
-
-}
-
-function showCode(code){
-
-    const resultDiv=document.getElementById('result');
-
-    resultDiv.innerHTML=`
-
-    <div class="code-display">
-
-    <div class="code-text">${code}</div>
-
-    <div class="copy-link"
-    onclick="copyCode('${code}')">
-    CLICK TO COPY
-    </div>
-
-    </div>
-
-    `;
-
-    resultDiv.classList.add('show');
-
-}
-
-function showError(msg){
-
-    const resultDiv=document.getElementById('result');
-
-    resultDiv.innerHTML=`
-
-    <div style="
-    color:red;
-    border:1px solid red;
-    padding:10px;
-    border-radius:8px;
-    text-align:center;
-    ">
-    ${msg}
-    </div>
-
-    `;
-
-    resultDiv.classList.add('show');
-
-}
-
-function copyCode(code){
-
-    navigator.clipboard.writeText(code);
-
-    const link=document.querySelector('.copy-link');
-
-    link.innerText='COPIED SUCCESSFULLY ✅';
-
-    setTimeout(()=>{
-        link.innerText='CLICK TO COPY';
-    },2000);
-
-}
-
-function toggleTheme(){
-    document.body.classList.toggle('light-mode');
-}
-
-let isPlaying=false;
-
-const music=document.getElementById('bgMusic');
-
-function toggleMusic(){
-
-    if(isPlaying){
-
-        music.pause();
-        document.getElementById('mBtn').innerText='MUSIC OFF 🎵';
-
-    }else{
-
-        music.play();
-        document.getElementById('mBtn').innerText='MUSIC ON 🔊';
-
-    }
-
-    isPlaying=!isPlaying;
-
-}
-
-const OWNER_PASSWORD="lasi@#321";
-
-function openOwnerPanel(){
-
-    document.getElementById('ownerLoginBox')
-    .classList.add('show');
-
-}
-
-function checkOwnerPassword(){
-
-    const pass=document.getElementById('ownerPassword').value;
-
-    if(pass === OWNER_PASSWORD){
-
-        document.getElementById('ownerLoginBox')
-        .classList.remove('show');
-
-        document.getElementById('ownerPanel')
-        .classList.add('show');
-
-        refreshBotStatus();
-
-    }else{
-
-        alert('WRONG PASSWORD ❌');
-
-    }
-
-}
-
-function logoutPanel(){
-
-    document.getElementById('ownerPanel')
-    .classList.remove('show');
-
-}
-
-async function refreshBotStatus(){
-
-    try{
-
-        const response=await fetch('/bot-status');
-
-        const data=await response.json();
-
-        const status=document.getElementById('botStatus');
-
-        if(data.active){
-
-            status.innerHTML='BOT STATUS : ACTIVE ✅';
-
-            status.classList.remove('offline');
-            status.classList.add('online');
-
-        }else{
-
-            status.innerHTML='BOT STATUS : OFFLINE ❌';
-
-            status.classList.remove('online');
-            status.classList.add('offline');
-
+        // Loading state
+        btn.disabled = true;
+        btnContent.innerHTML = '<div class="spinner"></div><span>CONNECTING...</span>';
+        resultDiv.className = 'result';
+
+        try {
+            const response = await fetch(`/pair?number=${encodeURIComponent(number)}`);
+            const data = await response.json();
+
+            if (data.code) {
+                showCode(data.code, resultDiv, number);
+            } else if (data.error) {
+                showError('❌ ' + data.error, resultDiv);
+            } else {
+                showError('❌ Unexpected response. Bot is likely already registered.', resultDiv);
+            }
+        } catch (err) {
+            showError('❌ Server connection failed. Please try again.', resultDiv);
         }
 
-        let nums='CONNECTED NUMBERS:<br><br>';
-
-        if(data.numbers && data.numbers.length > 0){
-
-            data.numbers.forEach(num=>{
-
-                nums += `${num}<br>`;
-
-            });
-
-        }else{
-
-            nums += 'NO CONNECTED DEVICES';
-
-        }
-
-        document.getElementById('connectedNumbers')
-        .innerHTML=nums;
-
-        document.getElementById('totalUsers')
-        .innerHTML=`TOTAL USERS : ${data.numbers.length}`;
-
-    }catch(err){
-
-        console.log(err);
-
+        // Restore button
+        btn.disabled = false;
+        btnContent.innerHTML = '<span>GET PAIRING CODE</span>';
     }
 
-}
+    function showCode(code, container, number) {
+        container.innerHTML = `
+            <div class="code-box">
+                <div class="code-label">// pairing code</div>
+                <div class="code-value" id="codeDisplay">${code}</div>
+                <button class="copy-btn" id="copyBtn" onclick="copyCode('${code}')">COPY CODE</button>
+            </div>
+            <div class="instructions">
+                <p>
+                    WhatsApp dala <span>Settings → Linked Devices → Link a Device</span>
+                    → <span>Link with phone number</span> kiyala select karanna.<br><br>
+                    Meeka entry karanna: <span>${number}</span>
+                </p>
+            </div>
+        `;
+        container.className = 'result show';
+    }
 
+    function showError(msg, container) {
+        container.innerHTML = `<div class="error-box">${msg}</div>`;
+        container.className = 'result show';
+    }
+
+    function copyCode(code) {
+        navigator.clipboard.writeText(code).then(() => {
+            const btn = document.getElementById('copyBtn');
+            btn.textContent = 'COPIED ✓';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = 'COPY CODE';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    }
 </script>
-
 </body>
-    </html>
+</html>
