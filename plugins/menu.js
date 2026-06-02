@@ -2,7 +2,7 @@ const { cmd, commands } = require('../command');
 const os = require('os');
 const moment = require('moment-timezone');
 
-const botLogo = "https://i.ibb.co/d4s455Fn/f32b832e8b8d.jpg";
+const botLogo = "https://files.catbox.moe/7z5x3q.jpg";
 
 const logoTypes = ["neon","neon2","fire2","glitch","hacker","futuristic","thunder","devil","fire","ice","snow","lava","metal","gold","silver","glossy","blackpink","transformer","horror","blood","joker","galaxy","space","cloud","sand","stone","magma","gradient","light","paper","watercolor","candy","christmas","luxury","leaf","summer","circuit","block3d","cartoon","chrome","frozen"];
 
@@ -38,12 +38,12 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
         else if (time >= 12 && time < 17) greeting = "Good Afternoon";
         else if (time >= 17 && time < 20) greeting = "Good Evening";
 
-        const menuText = `╭─── « 𝗗𝗧𝗘𝗖 𝗠𝗜𝗡𝗜 𝗩𝟯 » ───⟡
+        const menuText = `╭─── « 𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ1 » ───⟡
 │
 │ ⊳ *𝗛𝗶 ${pushname}, ${greeting}!*
 │
 │ ◈ 𝗩𝗲𝗿𝘀𝗶𝗼𝗻 : 3.0.0
-│ ◈ 𝗢𝘄𝗻𝗲𝗿  : Yasas Dileepa
+│ ◈ 𝗢𝘄𝗻𝗲𝗿  : shamika denuwan
 │ ◈ 𝗥𝗮𝗺    : ${ramUsage}
 │ ◈ 𝗨𝗽𝘁𝗶𝗺𝗲 : ${rtime}
 │ ◈ 𝗛𝗼𝘀𝘁   : ${hostname}
