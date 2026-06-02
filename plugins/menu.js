@@ -1,11 +1,10 @@
-const { cmd, commands } = require('../command'); 
+const { cmd, commands } = require('../command');
 const os = require('os');
 const moment = require('moment-timezone');
 
 const botLogo = "https://files.catbox.moe/7z5x3q.jpg";
 
 const logoTypes = ["neon","neon2","fire2","glitch","hacker","futuristic","thunder","devil","fire","ice","snow","lava","metal","gold","silver","glossy","blackpink","transformer","horror","blood","joker","galaxy","space","cloud","sand","stone","magma","gradient","light","paper","watercolor","candy","christmas","luxury","leaf","summer","circuit","block3d","cartoon","chrome","frozen"];
-
 
 cmd({
     pattern: "menu",
@@ -40,30 +39,32 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
 
         const menuText = `╭─── « 𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ1 » ───⟡
 │
-│ ⊳ *𝗛𝗶 ${pushname}, ${greeting}!*
+│ ⊳ *𝗛ɪ ${pushname}, ${greeting}!*
 │
-│ ◈ 𝗩𝗲𝗿𝘀𝗶𝗼𝗻 : 3.0.0
-│ ◈ 𝗢𝘄𝗻𝗲𝗿  : shamika denuwan
-│ ◈ 𝗥𝗮𝗺    : ${ramUsage}
-│ ◈ 𝗨𝗽𝘁𝗶𝗺𝗲 : ${rtime}
-│ ◈ 𝗛𝗼𝘀𝘁   : ${hostname}
-│
-╰───────────────⟡
-
-╭─── « 𝗖𝗢𝗠𝗠𝗔𝗡𝗗 𝗣𝗔𝗡𝗘𝗟 » ───⟡
-│
-│ [ 𝟭 ] 𝗠𝗔𝗜𝗡 𝗠𝗘𝗡𝗨
-│ [ 𝟮 ] 𝗢𝗪𝗡𝗘𝗥 𝗠𝗘𝗡𝗨
-│ [ 𝟯 ] 𝗚𝗥𝗢𝗨𝗣 𝗠𝗘𝗡𝗨
-│ [ 𝟰 ] 𝗟𝗢𝗚𝗢 𝗠𝗘𝗡𝗨
-│ [ 𝟱 ] 𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗦
-│ [ 𝟲 ] 𝗦𝗘𝗔𝗥𝗖𝗛 𝗠𝗘𝗡𝗨
-│ [ 𝟳 ] 𝗔𝗜 𝗙𝗘𝗔𝗧𝗨𝗥𝗘𝗦
-│ [ 𝟴 ] 𝗢𝗧𝗛𝗘𝗥 𝗧𝗢𝗢𝗟𝗦
+│ ◈ 𝐕ᴇʀsɪᴏɴ : 3.0.0
+│ ◈ 𝐎ᴡɴᴇʀ : sʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ
+│ ◈ 𝐑ᴀᴍ : ${ramUsage}
+│ ◈ 𝐔ᴘᴛɪᴍᴇ : ${rtime}
+│ ◈ 𝐇ᴏsᴛ : ${hostname}
 │
 ╰───────────────⟡
 
-> _Reply with a number to navigate._`;
+╭─── « 𝐂ᴏᴍᴀɴᴅ ᴘᴀɴᴇʟ » ───⟡
+│
+│ [ 𝟭 ] 𝐌ᴀɪɴ ᴍᴇɴᴜ
+│ [ 𝟮 ] 𝐎ᴡɴᴇʀ ᴍᴇɴᴜ
+│ [ 𝟯 ] 𝐆ʀᴏᴜᴘ ᴍᴇɴᴜ
+│ [ 𝟰 ] 𝐋ᴏɢᴏ ᴍᴇɴᴜ
+│ [ 𝟱 ] 𝐃ᴏᴡɴʟᴏᴀᴅs
+│ [ 𝟲 ] 𝐒ᴇᴀʀᴄʜ ᴍᴇɴᴜ
+│ [ 𝟳 ] 𝐀ɪ ғᴇᴀᴛᴜʀᴇs
+│ [ 𝟴 ] 𝐎ᴛʜᴇʀ ᴛᴏʟs
+│
+╰───────────────⟡
+
+> _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._
+
+> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
         const imgBuffer = Buffer.from(await (await fetch(botLogo)).arrayBuffer());
 
@@ -87,49 +88,47 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
 
     } catch (e) {
         console.log(e);
-        reply(`*❌ System Error!*\n\n${e}`);
+        reply(`*❌ 𝐒ʏsᴛᴇᴍ ᴇʀᴏʀ!*\n\n${e}`);
     }
 });
-
 
 const generateSubMenu = async (conn, mek, from, category, title, pushname, reply) => {
     try {
         let cmdList = '';
-        for (let i = 0; i < commands.length; i++) { 
-            if (commands[i].category === category && !commands[i].dontAddCommandList) {
-                cmdList += `│ ⊳ *${commands[i].pattern}*\n│   ${commands[i].desc || 'No Description'}\n│\n`;
+        for (let i = 0; i < commands.length; i++) {
+            if (commands[i].category === category &&!commands[i].dontAddCommandList) {
+                cmdList += `│ ⊳ *${commands[i].pattern}*\n│ ${commands[i].desc || 'No Description'}\n│\n`;
             }
         }
 
-        if (cmdList === '') cmdList = `│ ⊳ No commands found.\n│\n`;
+        if (cmdList === '') cmdList = `│ ⊳ 𝐍ᴏ ᴄᴏᴍᴀɴᴅs ғᴏᴜɴᴅ.\n│\n`;
 
-        let menuContent = `╭─── « 𝗗𝗧𝗘𝗖 𝗠𝗜𝗡𝗜 𝗩𝟯 » ───⟡
+        let menuContent = `╭─── « 𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ3 » ───⟡
 │
 │ ⊳ *${title}*
 │
 ${cmdList}╰───────────────⟡
 
-> © 𝗗𝗧𝗘𝗖 𝗠𝗜𝗡𝗜 𝗩𝟯`;
+> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
         const imgBuffer = Buffer.from(await (await fetch(botLogo)).arrayBuffer());
         await conn.sendMessage(from, { image: imgBuffer, caption: menuContent }, { quoted: mek });
-    } catch (e) { 
-        reply('*❌ Submenu Error !!*'); 
-        console.log(e); 
+    } catch (e) {
+        reply('*❌ 𝐒ᴜʙᴍᴇɴᴜ ᴇʀᴏʀ!!*');
+        console.log(e);
     }
 };
 
 cmd({ pattern: "logomenu", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
     try {
-        let logoList = `╭─── « 𝗗𝗧𝗘𝗖 𝗠𝗜𝗡𝗜 𝗩𝟯 » ───⟡
+        let logoList = `╭─── « 𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ1 » ───⟡
 │
-│ ⊳ *𝗟𝗢𝗚𝗢 𝗠𝗔𝗞𝗘𝗥 𝗠𝗘𝗡𝗨*
+│ ⊳ *𝐋ᴏɢᴏ ᴍᴀᴋᴇʀ ᴍᴇɴᴜ*
 │
 `;
-        
+
         logoTypes.forEach((type, index) => {
-            
             let num = (index + 1).toString().padStart(2, '0');
             logoList += `│ [ ${num} ] ${type.toUpperCase()}\n`;
         });
@@ -137,10 +136,10 @@ async(conn, mek, m, {from, pushname, reply}) => {
         logoList += `│
 ╰───────────────⟡
 
-> _Reply with a number to generate._
-> _To set custom name: .logo <name>_
+> _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɢᴇɴᴇʀᴀᴛᴇ._
+> _𝐓ᴏ sᴇᴛ ᴄᴜsᴛᴏᴍ ɴᴀᴍᴇ:.ʟᴏɢᴏ <ɴᴀᴍᴇ>_
 
-> © 𝗗𝗧𝗘𝗖 𝗠𝗜𝗡𝗜 𝗩𝟯`;
+> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
         const imgBuffer = Buffer.from(await (await fetch(botLogo)).arrayBuffer());
         const sentMsg = await conn.sendMessage(from, { image: imgBuffer, caption: logoList }, { quoted: mek });
@@ -154,43 +153,42 @@ async(conn, mek, m, {from, pushname, reply}) => {
         });
 
     } catch (e) {
-        reply('*❌ Logo Menu Error!*');
+        reply('*❌ 𝐋ᴏɢᴏ ᴍᴇɴᴜ ᴇʀᴏʀ!*');
         console.log(e);
     }
 });
 
-
 cmd({ pattern: "mainmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, mek, from, 'main', '𝗠𝗔𝗜𝗡 𝗖𝗢𝗠𝗠𝗔𝗡𝗗𝗦', pushname, reply);
+    await generateSubMenu(conn, mek, from, 'main', '𝐌ᴀɪɴ ᴄᴏᴍᴀɴᴅs', pushname, reply);
 });
 
 cmd({ pattern: "ownermenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, mek, from, 'owner', '𝗢𝗪𝗡𝗘𝗥 𝗖𝗢𝗠𝗠𝗔𝗡𝗗𝗦', pushname, reply);
+    await generateSubMenu(conn, mek, from, 'owner', '𝐎ᴡɴᴇʀ ᴄᴏᴍᴀɴᴅs', pushname, reply);
 });
 
 cmd({ pattern: "groupmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, mek, from, 'group', '𝗚𝗥𝗢𝗨𝗣 𝗖𝗢𝗠𝗠𝗔𝗡𝗗𝗦', pushname, reply);
+    await generateSubMenu(conn, mek, from, 'group', '𝐆ʀᴏᴜᴘ ᴄᴏᴍᴀɴᴅs', pushname, reply);
 });
 
 cmd({ pattern: "downloadmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, mek, from, 'download', '𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗𝗘𝗥𝗦', pushname, reply);
+    await generateSubMenu(conn, mek, from, 'download', '𝐃ᴏᴡɴʟᴏᴀᴅᴇʀs', pushname, reply);
 });
 
 cmd({ pattern: "searchmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, mek, from, 'search', '𝗦𝗘𝗔𝗥𝗖𝗛 𝗧𝗢𝗢𝗟𝗦', pushname, reply);
+    await generateSubMenu(conn, mek, from, 'search', '𝐒ᴇᴀʀᴄʜ ᴛᴏʟs', pushname, reply);
 });
 
 cmd({ pattern: "aimenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, mek, from, 'ai', '𝗔𝗜 𝗙𝗘𝗔𝗧𝗨𝗥𝗘𝗦', pushname, reply);
+    await generateSubMenu(conn, mek, from, 'ai', '𝐀ɪ ғᴇᴀᴛᴜʀᴇs', pushname, reply);
 });
 
 cmd({ pattern: "othermenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, mek, from, 'other', '𝗢𝗧𝗛𝗘𝗥 𝗨𝗧𝗜𝗟𝗜𝗧𝗜𝗘𝗦', pushname, reply);
+    await generateSubMenu(conn, mek, from, 'other', '𝐎ᴛʜᴇʀ ᴜᴛɪʟɪᴛɪᴇs', pushname, reply);
 });
