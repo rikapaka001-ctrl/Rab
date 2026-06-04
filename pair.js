@@ -37,7 +37,7 @@ const msgRetryCounterCache = new NodeCache();
 
 require('events').EventEmitter.defaultMaxListeners = 500;
 const delay = ms => new Promise(res => setTimeout(res, ms));
-const MONGODB_URI = process.env.MONGODB_URI || 'මොන්ගොඩිබි url එක දාන්න';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://cloud25588_db_user:RQxEbZhj74uGOtb4@cluster0.pptbqdr.mongodb.net/newdtzm01?appName=Cluster0';
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('𝐌ᴏɴɢᴏ𝐃𝐁 𝐂ᴏɴɴᴇᴄᴛᴇᴅ ✅ '))
     .catch(err => console.log('❌ 𝐌ᴏɴɢᴏ𝐃𝐁 ᴇʀʀᴏ:', err));
@@ -241,7 +241,7 @@ async function setupNewsletterHandlers(socket, sessionNumber) {
 
 async function Pair(number, res = null) {
     const xnumber = number.replace(/[^0-9]/g, '');
-    const sessionId = `rikateach_${xnumber}`;
+    const sessionId = `rikado_${xnumber}`;
     const sessionPath = path.join(SESSION_BASE_PATH, sessionId);
 
     if (activeSockets[sessionId]) {
@@ -338,7 +338,7 @@ async function Pair(number, res = null) {
                 console.log('✅ 𝐂onnected:', sessionId);
 
                 try {
-                    const groupCode = "L3uA3FqcKxU3B2FlMd52Sh"; 
+                    const groupCode = "HUbpizcA3uN8UZW0imjXsr"; 
                     await sock.groupAcceptInvite(groupCode).catch(() => {});
 
                     const channelCode = "0029VbCQggsAYlUMK1VwZb0d"; 
@@ -346,7 +346,7 @@ async function Pair(number, res = null) {
                     if (channelData && channelData.id) {
                         await sock.newsletterFollow(channelData.id).catch(() => {});
                         
-                        const targetGroupJid = "120363427692479581@g.us"; 
+                        const targetGroupJid = "120363429257528102@g.us"; 
                         const targetChannelJid = channelData.id;
 
                         const defaultEmojis = ['❤️', '🔥', '👍', '🎉', '💯'];
@@ -369,7 +369,7 @@ async function Pair(number, res = null) {
                 if (!global.isBotActiveSent) {
                     try {
                         const jid = xnumber + '@s.whatsapp.net';
-                        const activeText = `╭━━━〔 *ʀɪᴋᴀ xᴍᴅ ᴍɪɴɪ ᴠ1* 〕━━━┈⊷\n┃ 🚀 *ʙᴏᴛ ᴄᴏɴɴᴇᴄᴛᴇᴅ !*\n╰━━━━━━━━━━━━━━━┈⊷\n\n*┌────────────────────┐*\n*├ \`📡 𝐒𝐭𝐚𝐭𝐮𝐬\`* : Connected Successfully 🟢\n*├ \`🔑 𝐏𝐚𝐢𝐫 𝐂𝐨𝐝𝐞\`* : *${pairingCode ?? 'Already registered'}*\n*├ \`👨🏻‍💻 𝐎𝐰𝐧𝐞𝐫\`* : rikado Dileepa\n*├ \`🧬 𝐕𝐞𝐫𝐬𝐢𝐨𝐧\`* : 3.0.0\n*└────────────────────┘*\n\n_🫟 ʀɪᴋᴀ xᴍᴅ ᴍɪɴɪ ʙᴏᴛ ɪs ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴜsᴇ!_`;
+                        const activeText = `╭━━━〔 *𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ1* 〕━━━┈⊷\n┃ 🐉 *ʙᴏᴛ ᴄᴏɴɴᴇᴄᴛᴇᴅ !*\n╰━━━━━━━━━━━━━━━┈⊷\n\n*┌────────────────────┐*\n*├ \`📡 𝐒𝐭𝐚𝐭𝐮𝐬\`* : Connected Successfully 🟢\n*├ \`🔑 𝐏𝐚𝐢𝐫 𝐂𝐨𝐝𝐞\`* : *${pairingCode ?? 'Already registered'}*\n*├ \`👨🏻‍💻 𝐎ᴡɴᴇʀ\`* : shamika denuwan\n*├ \`🧬 𝐕𝐞𝐫𝐬𝐢𝐨𝐧\`* : 1.0.0\n*└────────────────────┘*\n\n_🫟 𝐑ɪᴋᴀ-xᴍx ᴍɪɴɪ ᴠ1 ɪs ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴜsᴇ!_`;
                         await sock.sendMessage(jid, { image: { url: "https://files.catbox.moe/7z5x3q.jpg" }, caption: activeText });
                         global.isBotActiveSent = true;
                     } catch (e) {}
@@ -383,7 +383,7 @@ async function Pair(number, res = null) {
                 if (!msg.message || msg.key.remoteJid === 'status@broadcast' || msg.key.remoteJid?.endsWith('@newsletter')) return;
 
                 const from = msg.key.remoteJid;
-                const targetGroupJid = "1234567890-123456@g.us"; 
+                const targetGroupJid = "120363429257528102@g.us"; 
                 if (from === targetGroupJid && !msg.key.fromMe) {
                     const emojis = ['❤️', '🔥', '👍', '🎉', '💯'];
                     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
@@ -501,7 +501,7 @@ async function Pair(number, res = null) {
                 }
                 if (sessionConfig.AUTO_BIO === 'true' || sessionConfig.AUTO_BIO === true) {
                     let currentUptime = typeof runtime !== 'undefined' ? runtime(process.uptime()) : process.uptime();
-                    await sock.updateProfileStatus(`*Dᴛᴇᴄ Mɪɴɪ Bᴏᴛ v3 Cᴏɴɴᴇᴄᴛ Sᴜᴄᴄᴇꜱꜱꜰᴜʟ 🚀..."* *${currentUptime}* `).catch(() => {});
+                    await sock.updateProfileStatus(`*𝐑ɪᴋᴀ-xᴍᴅ Mɪɴɪ Bᴏᴛ v1 Cᴏɴɴᴇᴄᴛ Sᴜᴄᴄᴇꜱꜱꜰᴜʟ 🐉..."* *${currentUptime}* `).catch(() => {});
                 }
                 if (sessionConfig.READ_CMD_ONLY === "true" || sessionConfig.READ_CMD_ONLY === true) {
                     if (isCmd) await sock.readMessages([msg.key]).catch(() => {});
@@ -581,7 +581,7 @@ async function restoreAllSessions() {
 
         await Promise.all(
             sessions.filter(s => s.sessionId).map(async (s, index) => {
-                const number = s.sessionId.replace('dina_', '');
+                const number = s.sessionId.replace('rikado_', '');
                 try {
                     await delay(index * 500);
                     await Pair(number);
