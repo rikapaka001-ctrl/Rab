@@ -1,5 +1,5 @@
 module.exports = {
-    PREFIX: "/",
+    PREFIX: ".",
     OWNER_NUMBER: "94766619363",
     BOT_NAME: "RIKA XMD MINI V1",
     WORK_TYPE: "public",
@@ -28,5 +28,5 @@ module.exports = {
     NEWSLETTER_JID: "120363428073031350@newsletter",
     GROUP_INVITE_LINK: "https://chat.whatsapp.com/L3uA3FqcKxU3B2FlMd52Sh",
     MAX_RETRIES: 3,
-    RCD_IMAGE_PATH: "https://files.catbox.moe/7z5x3q.jpg"
+    RCD_IMAGE_PATH: "https://i.ibb.co/4nH9Dvch/e90b7cd6667a.jpg"
 };
