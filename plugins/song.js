@@ -2,10 +2,13 @@ const { cmd } = require('../command');
 const yts = require('yt-search');
 const axios = require('axios');
 
+/* =======================
+   🎧 SONG COMMAND
+======================= */
 cmd({
     pattern: "song",
-    alias: ["play", "music", "ytaudio"],
-    desc: "YouTube song downloader (audio + document)",
+    alias: ["play", "music"],
+    desc: "YouTube song downloader (buttons + audio + doc)",
     category: "download",
     react: "🎧",
     filename: __filename
@@ -24,12 +27,16 @@ async (conn, mek, m, { from, q, reply }) => {
 
         if (!video) return reply("❌ Song හම්බුනේ නැහැ.");
 
-        const api = `https://api.giftedtech.web.id/api/download/ytmp3?url=${video.url}`;
+        // 🔥 Working API
+        const api = `https://api.vreden.web.id/api/ytmp3?url=${encodeURIComponent(video.url)}`;
         const { data } = await axios.get(api);
 
-        const audioUrl = data?.result?.download_url;
+        const audioUrl =
+            data?.result?.download_url ||
+            data?.download_url ||
+            data?.url;
 
-        if (!audioUrl) return reply("❌ Download failed.");
+        if (!audioUrl) return reply("❌ Audio download failed.");
 
         const caption = `
 ╭━━━〔 🎧 *RIKA SONG PLAYER* 💗 〕━━━⬣
@@ -39,7 +46,7 @@ async (conn, mek, m, { from, q, reply }) => {
 ┃ 👤 *Channel:* ${video.author.name}
 ╰━━━━━━━━━━━━━━━━⬣
 
-> 💞 Select your download type
+> 💞 Select download type below
 `;
 
         const buttons = [
@@ -69,17 +76,24 @@ async (conn, mek, m, { from, q, reply }) => {
 });
 
 
-// 🎧 AUDIO MP3 HANDLER
+/* =======================
+   🎧 AUDIO BUTTON
+======================= */
 cmd({
     pattern: "audio",
     dontAddCommandList: true
-}, async (conn, mek, m, { from, q }) => {
+},
+async (conn, mek, m, { from, q }) => {
     try {
 
-        const api = `https://api.giftedtech.web.id/api/download/ytmp3?url=${q}`;
+        const api = `https://api.vreden.web.id/api/ytmp3?url=${encodeURIComponent(q)}`;
         const { data } = await axios.get(api);
 
-        const audioUrl = data?.result?.download_url;
+        const audioUrl =
+            data?.result?.download_url ||
+            data?.download_url ||
+            data?.url;
+
         if (!audioUrl) return;
 
         await conn.sendMessage(from, {
@@ -88,22 +102,29 @@ cmd({
         }, { quoted: mek });
 
     } catch (e) {
-        console.log(e);
+        console.log("Audio Error:", e);
     }
 });
 
 
-// 📁 DOCUMENT HANDLER
+/* =======================
+   📁 DOCUMENT BUTTON
+======================= */
 cmd({
     pattern: "doc",
     dontAddCommandList: true
-}, async (conn, mek, m, { from, q }) => {
+},
+async (conn, mek, m, { from, q }) => {
     try {
 
-        const api = `https://api.giftedtech.web.id/api/download/ytmp3?url=${q}`;
+        const api = `https://api.vreden.web.id/api/ytmp3?url=${encodeURIComponent(q)}`;
         const { data } = await axios.get(api);
 
-        const audioUrl = data?.result?.download_url;
+        const audioUrl =
+            data?.result?.download_url ||
+            data?.download_url ||
+            data?.url;
+
         if (!audioUrl) return;
 
         await conn.sendMessage(from, {
@@ -113,6 +134,6 @@ cmd({
         }, { quoted: mek });
 
     } catch (e) {
-        console.log(e);
+        console.log("Doc Error:", e);
     }
 });
