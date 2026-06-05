@@ -2,7 +2,7 @@ const { cmd, commands } = require('../command');
 const os = require('os');
 const moment = require('moment-timezone');
 
-const botLogo = "https://files.catbox.moe/7z5x3q.jpg";
+const botLogo = "https://i.ibb.co/4nH9Dvch/e90b7cd6667a.jpg";
 
 const logoTypes = ["neon","neon2","fire2","glitch","hacker","futuristic","thunder","devil","fire","ice","snow","lava","metal","gold","silver","glossy","blackpink","transformer","horror","blood","joker","galaxy","space","cloud","sand","stone","magma","gradient","light","paper","watercolor","candy","christmas","luxury","leaf","summer","circuit","block3d","cartoon","chrome","frozen"];
 
