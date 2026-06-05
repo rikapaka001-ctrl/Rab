@@ -45,18 +45,6 @@ async (conn, mek, m, { from, q, reply }) => {
 
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗
 `;
-
-        if (cover) {
-            await conn.sendMessage(
-                from,
-                {
-                    image: { url: cover },
-                    caption: "🎵 *TikTok Video Found*"
-                },
-                { quoted: mek }
-            );
-        }
-
         await conn.sendMessage(
             from,
             {
