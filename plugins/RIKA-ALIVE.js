@@ -31,7 +31,7 @@ async (conn, mek, m, { from, reply }) => {
 `;
 
         await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/7z5x3q.jpg" },
+            image: { url: "https://i.ibb.co/4nH9Dvch/e90b7cd6667a.jpg" },
             caption: aliveText,
             footer: "> ＰᴏᴡᴇʀᴇᴅＢʏ ＳʜᴀᴍɪᴋᴀＤᴅᴇɴᴜᴡᴀɴ 🐉",
             buttons: [
