@@ -35,14 +35,14 @@ try {
 
     const caption = `
 
-╭━━━〔 🎧 RIKA SONG DL 💗 〕━━━⬣
-┃ 🎵 Title: ${video.title}
-┃ ⏱️ Duration: ${video.timestamp}
-┃ 👤 Channel: ${video.author.name}
-┃ 👁️ Views: ${video.views}
-╰━━━━━━━━━━━━━━━━⬣
+*〢━┅﹝𝗥𝗜𝗞𝗔 𝗫𝗠𝗗 💋﹞━┅*
+*┃ 🎵 ᴛɪᴛʟᴇ :* ${video.title}
+*┃ ⏱️ ᴅᴜʀᴀᴛɪᴏɴ :* ${video.timestamp}
+*┃ 👤 ᴄʜᴀɴᴇʟ :* ${video.author.name}
+*┃ 👁️ ᴠɪᴇᴡꜱ :* ${video.views}
+*╰───────────── ❍*
 
-> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗
+© 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗
 `;
 
     await conn.sendMessage(
