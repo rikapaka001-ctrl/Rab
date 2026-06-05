@@ -2,13 +2,10 @@ const { cmd } = require('../command');
 const yts = require('yt-search');
 const axios = require('axios');
 
-/* =======================
-   🎧 SONG COMMAND
-======================= */
 cmd({
     pattern: "song",
     alias: ["play", "music"],
-    desc: "YouTube song downloader (buttons + audio + doc)",
+    desc: "YouTube song downloader (buttons + mp3 + doc)",
     category: "download",
     react: "🎧",
     filename: __filename
@@ -27,14 +24,14 @@ async (conn, mek, m, { from, q, reply }) => {
 
         if (!video) return reply("❌ Song හම්බුනේ නැහැ.");
 
-        // 🔥 Working API
-        const api = `https://api.vreden.web.id/api/ytmp3?url=${encodeURIComponent(video.url)}`;
+        // ✅ SINGLE STABLE API ONLY
+        const api = `https://api.dhamzxploit.my.id/api/ytmp3?url=${encodeURIComponent(video.url)}`;
         const { data } = await axios.get(api);
 
         const audioUrl =
             data?.result?.download_url ||
-            data?.download_url ||
-            data?.url;
+            data?.result?.url ||
+            data?.download_url;
 
         if (!audioUrl) return reply("❌ Audio download failed.");
 
@@ -46,7 +43,7 @@ async (conn, mek, m, { from, q, reply }) => {
 ┃ 👤 *Channel:* ${video.author.name}
 ╰━━━━━━━━━━━━━━━━⬣
 
-> 💞 Select download type below
+> 💞 Select option below
 `;
 
         const buttons = [
@@ -77,7 +74,7 @@ async (conn, mek, m, { from, q, reply }) => {
 
 
 /* =======================
-   🎧 AUDIO BUTTON
+   🎧 AUDIO
 ======================= */
 cmd({
     pattern: "audio",
@@ -86,13 +83,13 @@ cmd({
 async (conn, mek, m, { from, q }) => {
     try {
 
-        const api = `https://api.vreden.web.id/api/ytmp3?url=${encodeURIComponent(q)}`;
+        const api = `https://api.dhamzxploit.my.id/api/ytmp3?url=${encodeURIComponent(q)}`;
         const { data } = await axios.get(api);
 
         const audioUrl =
             data?.result?.download_url ||
-            data?.download_url ||
-            data?.url;
+            data?.result?.url ||
+            data?.download_url;
 
         if (!audioUrl) return;
 
@@ -102,13 +99,13 @@ async (conn, mek, m, { from, q }) => {
         }, { quoted: mek });
 
     } catch (e) {
-        console.log("Audio Error:", e);
+        console.log(e);
     }
 });
 
 
 /* =======================
-   📁 DOCUMENT BUTTON
+   📁 DOCUMENT
 ======================= */
 cmd({
     pattern: "doc",
@@ -117,13 +114,13 @@ cmd({
 async (conn, mek, m, { from, q }) => {
     try {
 
-        const api = `https://api.vreden.web.id/api/ytmp3?url=${encodeURIComponent(q)}`;
+        const api = `https://api.dhamzxploit.my.id/api/ytmp3?url=${encodeURIComponent(q)}`;
         const { data } = await axios.get(api);
 
         const audioUrl =
             data?.result?.download_url ||
-            data?.download_url ||
-            data?.url;
+            data?.result?.url ||
+            data?.download_url;
 
         if (!audioUrl) return;
 
@@ -134,6 +131,6 @@ async (conn, mek, m, { from, q }) => {
         }, { quoted: mek });
 
     } catch (e) {
-        console.log("Doc Error:", e);
+        console.log(e);
     }
 });
