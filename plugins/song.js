@@ -3,62 +3,69 @@ const yts = require('yt-search');
 const axios = require('axios');
 
 cmd({
-    pattern: "song",
-    alias: ["play", "ytaudio"],
-    desc: "Download YouTube song",
-    category: "download",
-    react: "🎧",
-    filename: __filename
+pattern: "song",
+alias: ["play", "music"],
+desc: "Download YouTube Songs",
+category: "download",
+react: "🎧",
+filename: __filename
 },
 async (conn, mek, m, { from, q, reply }) => {
-    try {
+try {
 
-        if (!q) return reply("❌ Song name දෙන්න.\n\nExample: .song shape of you");
+    if (!q) {
+        return reply("❌ Please provide a song name.\n\nExample: .song Alan Walker Faded");
+    }
 
-        await reply("🎧 Searching song...");
+    await reply("🔎 Searching song...");
 
-        // YouTube search
-        const search = await yts(q);
-        const video = search.videos[0];
+    const search = await yts(q);
+    const video = search.videos[0];
 
-        if (!video) return reply("❌ Song found නැහැ.");
+    if (!video) return reply("❌ Song not found.");
 
-        const url = video.url;
+    const api = `https://podda-api.zone.id/ytmp3?url=${encodeURIComponent(video.url)}`;
+    const { data } = await axios.get(api);
 
-        const caption = `
-╭━━━〔 🎧 *RIKA SONG DL* 💗 〕━━━⬣
-┃ 🎵 *Title:* ${video.title}
-┃ ⏱️ *Duration:* ${video.timestamp}
-┃ 👁️ *Views:* ${video.views}
-┃ 👤 *Channel:* ${video.author.name}
+    if (!data.status || !data.result?.downloadUrl) {
+        return reply("❌ Audio download failed.");
+    }
+
+    const audioUrl = data.result.downloadUrl;
+
+    const caption = `
+
+╭━━━〔 🎧 RIKA SONG DL 💗 〕━━━⬣
+┃ 🎵 Title: ${video.title}
+┃ ⏱️ Duration: ${video.timestamp}
+┃ 👤 Channel: ${video.author.name}
+┃ 👁️ Views: ${video.views}
 ╰━━━━━━━━━━━━━━━━⬣
 
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗
-`;
+`;»
 
-        await conn.sendMessage(from, {
+    await conn.sendMessage(
+        from,
+        {
             image: { url: video.thumbnail },
             caption
-        }, { quoted: mek });
+        },
+        { quoted: mek }
+    );
 
-        // audio API (fast working)
-        const api = `https://api.giftedtech.web.id/api/download/ytmp3?url=${encodeURIComponent(url)}`;
-
-        const { data } = await axios.get(api);
-
-        if (!data || !data.result || !data.result.download_url) {
-            return reply("❌ Download failed.");
-        }
-
-        const audioUrl = data.result.download_url;
-
-        await conn.sendMessage(from, {
+    await conn.sendMessage(
+        from,
+        {
             audio: { url: audioUrl },
             mimetype: "audio/mpeg"
-        }, { quoted: mek });
+        },
+        { quoted: mek }
+    );
 
-    } catch (e) {
-        console.log(e);
-        reply("❌ Error: " + e.message);
-    }
+} catch (e) {
+    console.log("Song Error:", e);
+    reply("❌ Error: " + e.message);
+}
+
 });
