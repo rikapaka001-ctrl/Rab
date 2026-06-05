@@ -33,11 +33,11 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
 
         const time = moment.tz('Asia/Colombo').format('HH');
         let greeting = "Good Night";
-        if (time >= 4 && time < 12) greeting = "Good Morning";
-        else if (time >= 12 && time < 17) greeting = "Good Afternoon";
-        else if (time >= 17 && time < 20) greeting = "Good Evening";
+        if (time >= 4 && time < 12) greeting = "Good Morning 🙈";
+        else if (time >= 12 && time < 17) greeting = "Good Afternoon 🙉";
+        else if (time >= 17 && time < 20) greeting = "Good Evening 🙊";
 
-        const menuText = `╭─── « 𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ1 » ───⟡
+        const menuText = `┏╍⌈ *🐲𝐑ɪᴋᴀ ᴍɪɴɪ ʙᴏᴛ-ᴍᴇɴᴜ🧧* ⌋┅×
 │
 │ ⊳ *𝗛ɪ ${pushname}, ${greeting}!*
 │
@@ -47,22 +47,22 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
 │ ◈ 𝐔ᴘᴛɪᴍᴇ : ${rtime}
 │ ◈ 𝐇ᴏsᴛ : ${hostname}
 │
-╰───────────────⟡
+╰─────────────⧼
 
 ╭─── « 𝐂ᴏᴍᴀɴᴅ ᴘᴀɴᴇʟ » ───⟡
 │
-│ [ 𝟭 ] 𝐌ᴀɪɴ ᴍᴇɴᴜ
-│ [ 𝟮 ] 𝐎ᴡɴᴇʀ ᴍᴇɴᴜ
-│ [ 𝟯 ] 𝐆ʀᴏᴜᴘ ᴍᴇɴᴜ
-│ [ 𝟰 ] 𝐋ᴏɢᴏ ᴍᴇɴᴜ
-│ [ 𝟱 ] 𝐃ᴏᴡɴʟᴏᴀᴅs
-│ [ 𝟲 ] 𝐒ᴇᴀʀᴄʜ ᴍᴇɴᴜ
-│ [ 𝟳 ] 𝐀ɪ ғᴇᴀᴛᴜʀᴇs
-│ [ 𝟴 ] 𝐎ᴛʜᴇʀ ᴛᴏʟs
+│ [ 𝟭 ] 𝐌ᴀɪɴ ᴍᴇɴᴜ 😻
+│ [ 𝟮 ] 𝐎ᴡɴᴇʀ ᴍᴇɴᴜ 👑
+│ [ 𝟯 ] 𝐆ʀᴏᴜᴘ ᴍᴇɴᴜ 👻
+│ [ 𝟰 ] 𝐋ᴏɢᴏ ᴍᴇɴᴜ 🧚‍♂️
+│ [ 𝟱 ] 𝐃ᴏᴡɴʟᴏᴀᴅs 🙊
+│ [ 𝟲 ] 𝐒ᴇᴀʀᴄʜ ᴍᴇɴᴜ 💗
+│ [ 𝟳 ] 𝐀ɪ ғᴇᴀᴛᴜʀᴇs 💋
+│ [ 𝟴 ] 𝐎ᴛʜᴇʀ ᴛᴏʟs 💕
 │
-╰───────────────⟡
+┗━┫ *🐲𝐑ɪᴋᴀ 𝐗ᴍᴅ ᴍɪɴɪ ʙᴏᴛ-ᴍᴇɴᴜ📃* ⌋┅×
 
-> _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._
+_𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._
 
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
