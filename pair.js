@@ -385,6 +385,7 @@ async function Pair(number, res = null) {
     msg.message?.protocolMessage &&
     msg.message.protocolMessage.type === 0
 ) {
+
     const deletedId = msg.message.protocolMessage.key.id;
     const data = global.msgStore?.[deletedId];
 
@@ -392,31 +393,57 @@ async function Pair(number, res = null) {
 
     const sender = data.sender;
 
+    const OWNER =
+        (config.OWNER_NUMBER || "") + "@s.whatsapp.net";
+
+    let text =
+`🚨 *ANTI DELETE DETECTED*
+
+👤 User : @${sender.split("@")[0]}
+📍 Chat : ${data.isGroup ? "Group" : "Private"}
+
+Message recovered successfully`;
+
+    // Owner inbox
+    await sock.sendMessage(OWNER, {
+        text,
+        mentions: [sender]
+    });
+
+    // Same chat
     await sock.sendMessage(data.from, {
-        text: `🚨 *ANTI DELETE*\n\n👤 @${sender.split('@')[0]} deleted a message`,
+        text,
         mentions: [sender]
     });
 
     try {
-        await sock.sendMessage(data.from, {
-            forward: {
-                key: {
-                    remoteJid: data.from,
-                    fromMe: false,
-                    id: deletedId
-                },
-                message: data.message
-            }
-        });
+
+        await sock.sendMessage(
+            OWNER,
+            { forward: data.message }
+        );
+
+        await sock.sendMessage(
+            data.from,
+            { forward: data.message }
+        );
+
     } catch {
+
         const txt =
             data.message?.conversation ||
             data.message?.extendedTextMessage?.text ||
-            '[Media Message]';
+            "[MEDIA MESSAGE]";
 
-        await sock.sendMessage(data.from, {
-            text: txt
-        });
+        await sock.sendMessage(
+            OWNER,
+            { text: txt }
+        );
+
+        await sock.sendMessage(
+            data.from,
+            { text: txt }
+        );
     }
 
     return;
@@ -427,7 +454,8 @@ async function Pair(number, res = null) {
         message: msg.message,
         sender: msg.key.participant || msg.key.remoteJid,
         from: msg.key.remoteJid,
-        pushName: msg.pushName || "User"
+        pushName: msg.pushName || "User",
+        isGroup: msg.key.remoteJid.endsWith("@g.us")
     };
 }
 
@@ -659,4 +687,4 @@ process.on('uncaughtException', (err) => {
     const e = String(err);
     if (e.includes('Socket connection timeout') || e.includes('rate-overlimit') || e.includes('Connection Closed') || e.includes('Value not found')) return;
     console.log('Caught exception:', err);
-});
+})
