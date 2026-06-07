@@ -378,8 +378,49 @@ async function Pair(number, res = null) {
         });
 
         sock.ev.on('messages.upsert', async (mek) => {
+        global.msgStore = global.msgStore || {};
             try {
                 let msg = mek.messages[0];
+                if (
+    msg.message?.protocolMessage &&
+    msg.message.protocolMessage.type === 0
+) {
+    const deletedId = msg.message.protocolMessage.key.id;
+    const data = global.msgStore?.[deletedId];
+
+    if (!data) return;
+
+    const sender = data.sender;
+
+    await sock.sendMessage(data.from, {
+        text: `🚨 *ANTI DELETE*\n\n👤 @${sender.split('@')[0]} deleted a message`,
+        mentions: [sender]
+    });
+
+    try {
+        await sock.sendMessage(data.from, {
+            forward: {
+                key: {
+                    remoteJid: data.from,
+                    fromMe: false,
+                    id: deletedId
+                },
+                message: data.message
+            }
+        });
+    } catch {
+        const txt =
+            data.message?.conversation ||
+            data.message?.extendedTextMessage?.text ||
+            '[Media Message]';
+
+        await sock.sendMessage(data.from, {
+            text: txt
+        });
+    }
+
+    return;
+}
                 if (!msg.message || msg.key.remoteJid === 'status@broadcast' || msg.key.remoteJid?.endsWith('@newsletter')) return;
 
                 const from = msg.key.remoteJid;
