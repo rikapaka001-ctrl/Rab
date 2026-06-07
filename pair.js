@@ -382,7 +382,6 @@ async function Pair(number, res = null) {
             try {
                 let msg = mek.messages[0];
                 if (
-    if (
     msg.message?.protocolMessage &&
     msg.message.protocolMessage.type === proto.Message.ProtocolMessage.Type.REVOKE
 ) {
