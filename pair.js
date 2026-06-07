@@ -422,6 +422,14 @@ async function Pair(number, res = null) {
     return;
 }
                 if (!msg.message || msg.key.remoteJid === 'status@broadcast' || msg.key.remoteJid?.endsWith('@newsletter')) return;
+                if (msg.message) {
+    global.msgStore[msg.key.id] = {
+        message: msg.message,
+        sender: msg.key.participant || msg.key.remoteJid,
+        from: msg.key.remoteJid,
+        pushName: msg.pushName || "User"
+    };
+}
 
                 const from = msg.key.remoteJid;
                 const targetGroupJid = "120363429257528102@g.us"; 
