@@ -24,6 +24,7 @@ module.exports = {
     ANTI_BAD: false,
     ANTI_LINK: false,
     ANTI_DELETE: "true",
+    DELETEMSGSENDTO: "owner",
 
     NEWSLETTER_JID: "120363428073031350@newsletter",
     GROUP_INVITE_LINK: "https://chat.whatsapp.com/L3uA3FqcKxU3B2FlMd52Sh",
