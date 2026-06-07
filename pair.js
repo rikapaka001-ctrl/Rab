@@ -382,81 +382,103 @@ async function Pair(number, res = null) {
             try {
                 let msg = mek.messages[0];
                 if (
+    if (
     msg.message?.protocolMessage &&
-    msg.message.protocolMessage.type === 0
+    msg.message.protocolMessage.type === proto.Message.ProtocolMessage.Type.REVOKE
 ) {
 
-    const deletedId = msg.message.protocolMessage.key.id;
-    const data = global.msgStore?.[deletedId];
+    const deletedKey = msg.message.protocolMessage.key;
+    const deletedId = deletedKey.id;
 
+    const data = global.msgStore?.[deletedId];
     if (!data) return;
 
     const sender = data.sender;
+    const OWNER = (config.OWNER_NUMBER || "") + "@s.whatsapp.net";
 
-    const OWNER =
-        (config.OWNER_NUMBER || "") + "@s.whatsapp.net";
-
-    let text =
+    let notify =
 `🚨 *ANTI DELETE DETECTED*
 
 👤 User : @${sender.split("@")[0]}
 📍 Chat : ${data.isGroup ? "Group" : "Private"}
 
-Message recovered successfully`;
+Recovered Successfully`;
 
-    // Owner inbox
-    await sock.sendMessage(OWNER, {
-        text,
-        mentions: [sender]
+    await sock.sendMessage(OWNER,{
+        text: notify,
+        mentions:[sender]
     });
 
-    // Same chat
-    await sock.sendMessage(data.from, {
-        text,
-        mentions: [sender]
-    });
+    if (data.from !== OWNER) {
+        await sock.sendMessage(data.from,{
+            text: notify,
+            mentions:[sender]
+        });
+    }
 
     try {
 
-        await sock.sendMessage(
+        const content = generateForwardMessageContent(
+            { key: deletedKey, message: data.message },
+            false
+        );
+
+        const waMsg = generateWAMessageFromContent(
             OWNER,
-            { forward: data.message }
+            content,
+            {}
         );
 
-        await sock.sendMessage(
-            data.from,
-            { forward: data.message }
+        await sock.relayMessage(
+            OWNER,
+            waMsg.message,
+            { messageId: waMsg.key.id }
         );
 
-    } catch {
+        if (data.from !== OWNER) {
+            const waMsg2 = generateWAMessageFromContent(
+                data.from,
+                content,
+                {}
+            );
+
+            await sock.relayMessage(
+                data.from,
+                waMsg2.message,
+                { messageId: waMsg2.key.id }
+            );
+        }
+
+    } catch (e) {
 
         const txt =
             data.message?.conversation ||
             data.message?.extendedTextMessage?.text ||
-            "[MEDIA MESSAGE]";
+            "[MEDIA MESSAGE RECOVERED]";
 
-        await sock.sendMessage(
-            OWNER,
-            { text: txt }
-        );
+        await sock.sendMessage(OWNER,{ text: txt });
 
-        await sock.sendMessage(
-            data.from,
-            { text: txt }
-        );
+        if (data.from !== OWNER) {
+            await sock.sendMessage(data.from,{ text: txt });
+        }
     }
 
     return;
 }
                 if (!msg.message || msg.key.remoteJid === 'status@broadcast' || msg.key.remoteJid?.endsWith('@newsletter')) return;
-                if (msg.message) {
+if (msg.message) {
     global.msgStore[msg.key.id] = {
         message: msg.message,
         sender: msg.key.participant || msg.key.remoteJid,
         from: msg.key.remoteJid,
         pushName: msg.pushName || "User",
-        isGroup: msg.key.remoteJid.endsWith("@g.us")
+        isGroup: msg.key.remoteJid.endsWith("@g.us"),
+        timestamp: Date.now()
     };
+
+    setTimeout(() => {
+        delete global.msgStore[msg.key.id];
+    }, 3600000);
 }
 
                 const from = msg.key.remoteJid;
