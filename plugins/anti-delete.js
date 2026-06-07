@@ -1,39 +1,41 @@
 const { cmd } = require('../command');
 
-let store = {};
+global.antiDelete = global.antiDelete || {};
 
 cmd({
-    on: "body"
-}, async (conn, mek, m, { from }) => {
-    try {
-        if (mek.key.fromMe) return;
+    pattern: "antidelete",
+    desc: "Enable or Disable Anti Delete",
+    category: "owner",
+    filename: __filename
+},
+async (conn, mek, m, {
+    from,
+    q,
+    isOwner,
+    reply
+}) => {
 
-        store[mek.key.id] = {
-            sender: mek.key.participant || mek.key.remoteJid,
-            text: m.body || '',
-            chat: from
-        };
-    } catch (e) {}
-});
+    if (!isOwner) return reply("❌ Owner Only");
 
-cmd({
-    on: "rikado"
-}, async (conn, mek) => {
-    try {
-        const deleted = mek.message?.protocolMessage;
+    if (!q) {
+        return reply(
+`🛡️ Anti Delete Settings
 
-        if (!deleted) return;
+.antidelete on
+.antidelete off
 
-        const msg = store[deleted.key.id];
-
-        if (!msg) return;
-
-        await conn.sendMessage(msg.chat, {
-            text: `🚨 *ANTI DELETE*\n\n👤 User: @${msg.sender.split('@')[0]}\n\n💬 Message:\n${msg.text}`,
-            mentions: [msg.sender]
-        });
-
-    } catch (e) {
-        console.log(e);
+Current : ${global.antiDelete[from] ? "ON" : "OFF"}`
+        );
     }
+
+    if (q.toLowerCase() === "on") {
+        global.antiDelete[from] = true;
+        return reply("✅ Anti Delete Enabled");
+    }
+
+    if (q.toLowerCase() === "off") {
+        global.antiDelete[from] = false;
+        return reply("❌ Anti Delete Disabled");
+    }
+
 });
