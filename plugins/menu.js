@@ -70,7 +70,34 @@ _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._
 
         const sentMsg = await conn.sendMessage(from, {
             image: imgBuffer,
-            caption: menuText
+            caption: menuText,
+            footer: "> © Ｐᴏᴡᴇʀᴇᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗",
+            buttons: [
+                {
+                    buttonId: ".mainmenu",
+                    buttonText: { displayText: "😻 Main" },
+                    type: 1
+                },
+                {
+                    buttonId: ".ownermenu",
+                    buttonText: { displayText: "👑 Owner" },
+                    type: 1
+                },
+                {
+                    buttonId: ".downloadmenu",
+                    buttonText: { displayText: "🙊 Downloads" },
+                    type: 1
+                }
+            ],
+            headerType: 4,
+            contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: "120363428073031350@newsletter",
+                    newsletterName: "Ｒɪᴋᴀ Ｘᴍᴅ 🐉"
+                }
+            }
         }, { quoted: mek });
 
         const msgId = sentMsg.key.id;
