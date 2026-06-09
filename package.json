@@ -20,6 +20,7 @@
     "qrcode-terminal": "^0.12.0",
     "yt-search": "^2.10.4",
     "wa-sticker-formatter": "latest",
+    "child_process": "latest",
     "fluent-ffmpeg": "^2.1.2",
     "ffmpeg-static": "^5.2.0",
     "g-i-s": "^2.1.6",
