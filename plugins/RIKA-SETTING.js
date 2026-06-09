@@ -361,3 +361,41 @@ ${config.AUTO_READ_STATUS ? 'ON ✅' : 'OFF ❌'}
     return reply(text);
 
 });
+
+cmd({
+    pattern: "autorecording",
+    alias: ["recording"],
+    desc: "Auto Recording ON/OFF",
+    category: "settings",
+    filename: __filename
+},
+async (conn, mek, m, { q, isOwner, reply }) => {
+
+    if (!isOwner) return reply("Owner Only!");
+
+    const botNumber = conn.user.id.split(":")[0];
+
+    let conf = await loadUserConfigFromMongo(botNumber) || {};
+
+    if (!q) {
+        return reply(
+            `🎙️ Auto Recording : ${conf.AUTO_RECORDING ? "ON" : "OFF"}\n\n` +
+            `.autorecording on\n` +
+            `.autorecording off`
+        );
+    }
+
+    if (q.toLowerCase() === "on") {
+        conf.AUTO_RECORDING = true;
+        await setUserConfigInMongo(botNumber, conf);
+        return reply("✅ Auto Recording Enabled");
+    }
+
+    if (q.toLowerCase() === "off") {
+        conf.AUTO_RECORDING = false;
+        await setUserConfigInMongo(botNumber, conf);
+        return reply("❌ Auto Recording Disabled");
+    }
+
+    reply("Use: .autorecording on/off");
+});
