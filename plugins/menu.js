@@ -62,9 +62,7 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
 │
 ┗━┫ *🐲𝐑ɪᴋᴀ 𝐗ᴍᴅ ᴍɪɴɪ ʙᴏᴛ-ᴍᴇɴᴜ📃* ⌋┅×
 
-_𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._
-
-> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
+_𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._`;
 
         // Alive වගේම url use කරපන්, buffer නෙවෙයි
         const sentMsg = await conn.sendMessage(from, {
@@ -72,9 +70,8 @@ _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._
             caption: menuText,
             footer: "> © Ｐᴏᴡᴇʀᴇᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗",
             buttons: [
-                { buttonId: ".mainmenu", buttonText: { displayText: "😻 Main" }, type: 1 },
-                { buttonId: ".ownermenu", buttonText: { displayText: "👑 Owner" }, type: 1 },
-                { buttonId: ".downloadmenu", buttonText: { displayText: "🙊 Downloads" }, type: 1 }
+                { buttonId: ".alive", buttonText: { displayText: "𝐀ʟɪᴠᴇ 💗" }, type: 1 },
+                { buttonId: ".ping", buttonText: { displayText: "𝐏ɪɴɢ 🐲" }, type: 1 }
             ],
             headerType: 4,
             contextInfo: {
