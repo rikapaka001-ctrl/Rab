@@ -361,7 +361,6 @@ ${config.AUTO_READ_STATUS ? 'ON ✅' : 'OFF ❌'}
     return reply(text);
 
 });
-
 cmd({
     pattern: "autorecording",
     alias: ["recording"],
