@@ -5,61 +5,57 @@ const path = require('path');
 const { exec } = require('child_process');
 
 cmd({
-    pattern: "sticker",
-    alias: ["s", "stick"],
-    desc: "Image/Video sticker",
-    category: "convert",
-    react: "🎨",
+    pattern: 'sticker',
+    react: '🤹‍♀️',
+    alias: ['s', 'stic'],
+    desc: descg,
+    category: 'convert',
+    use: '.sticker <Reply to image>',
     filename: __filename
-},
-async(conn, mek, m, { from, reply }) => {
+}, async (conn, mek, m, { from, reply, isCmd, command, args, q, isGroup, pushname }) => {
     try {
-        if (!m.quoted) return reply("*𝐑ᴇᴘʟʏ ᴛᴏ ᴀɴ 𝐈ᴍᴀɢᴇ ᴏʀ 𝐕ɪᴅᴇᴏ*");
+        const isQuotedImage = m.quoted && (m.quoted.type === 'imageMessage' || (m.quoted.type === 'viewOnceMessage' && m.quoted.msg.type === 'imageMessage'))
+        const isQuotedSticker = m.quoted && m.quoted.type === 'stickerMessage'
 
-        const msg = m.quoted;
-        const mime = msg.mimetype || '';
-        
-        reply("*𝐂ʀᴇᴀᴛɪɴɢ sᴛɪᴄᴋᴇʀ... ⏳*");
+        if ((m.type === 'imageMessage') || isQuotedImage) {
+            const nameJpg = getRandom('.jpg')
+            const imageBuffer = isQuotedImage ? await m.quoted.download() : await m.download()
+            await require('fs').promises.writeFile(nameJpg, imageBuffer)
 
-        // Image sticker
-        if (mime.includes('image')) {
-            const buffer = await conn.downloadMediaMessage(msg);
-            const sticker = new Sticker(buffer, {
-                pack: 'RIKA XMD',
-                author: 'RIKA XMD',
-                type: StickerTypes.FULL,
-                quality: 50
+            let sticker = new Sticker(nameJpg, {
+                pack: pushname, // The pack name
+                author: '𝗥𝗜𝗞𝗔 𝗫𝗠𝗗 🌪️', // The author name
+                type: q.includes('--crop') || q.includes('-c') ? StickerTypes.CROPPED : StickerTypes.FULL,
+                categories: ['🤩', '🎉'], // The sticker category
+                id: '12345', // The sticker id
+                quality: 75, // The quality of the output file
+                background: 'transparent', // The sticker background color (only for full stickers)
             });
-            const stickerBuffer = await sticker.toBuffer();
-            await conn.sendMessage(from, { sticker: stickerBuffer }, { quoted: m });
-        }
 
-        // Video sticker
-        else if (mime.includes('video')) {
-            const buffer = await conn.downloadMediaMessage(msg);
-            const tempPath = `./temp/${Date.now()}.mp4`;
-            const webpPath = tempPath.replace('.mp4', '.webp');
-            
-            if (!fs.existsSync('./temp')) fs.mkdirSync('./temp');
-            fs.writeFileSync(tempPath, buffer);
-            
-            exec(`ffmpeg -i ${tempPath} -vcodec libwebp -fs 1M -filter:v fps=15,scale=512:512:flags=lanczos:force_original_aspect_ratio=decrease,format=rgba,pad=512:512:(ow-iw)/2:(oh-ih)/2:color=0x00000 ${webpPath}`, async (err) => {
-                if (err) {
-                    fs.unlinkSync(tempPath);
-                    return reply("*𝐄ʀᴏʀ: Fғᴍᴘᴇɢ ɴᴏᴛ ɪɴsᴛᴀʟᴇᴅ ᴏʀ ᴠɪᴅᴇᴏ ᴛᴏ ʟᴏɴɢ*");
-                }
-                const stickerBuffer = fs.readFileSync(webpPath);
-                await conn.sendMessage(from, { sticker: stickerBuffer }, { quoted: m });
-                fs.unlinkSync(tempPath);
-                fs.unlinkSync(webpPath);
+            const buffer = await sticker.toBuffer()
+            return conn.sendMessage(from, { sticker: buffer }, { quoted: mek })
+        } else if (isQuotedSticker) {
+            const nameWebp = getRandom('.webp')
+            const stickerBuffer = await m.quoted.download()
+            await require('fs').promises.writeFile(nameWebp, stickerBuffer)
+
+            let sticker = new Sticker(nameWebp, {
+                pack: pushname, // The pack name
+                author: 'ANGEL-X', // The author name
+                type: q.includes('--crop') || q.includes('-c') ? StickerTypes.CROPPED : StickerTypes.FULL,
+                categories: ['🤩', '🎉'], // The sticker category
+                id: '12345', // The sticker id
+                quality: 75, // The quality of the output file
+                background: 'transparent', // The sticker background color (only for full stickers)
             });
-        }
 
-        else {
-            return reply(`*𝐔ɴsᴜᴘᴏʀᴛᴇᴅ: ${mime}*\n*𝐎ɴʟʏ 𝐈ᴍᴀɢᴇ/𝐕ɪᴅᴇᴏ*`);
+            const buffer = await sticker.toBuffer();
+            return conn.sendMessage(from, { sticker: buffer }, { quoted: mek })
+        } else {
+            return await reply(imgmsg)
         }
     } catch (e) {
-        console.error(e);
-        reply("*𝐄ʀᴏʀ ᴄʀᴇᴀᴛɪɴɢ sᴛɪᴄᴋᴇʀ*");
+        reply('Error !!')
+        console.error(e)
     }
 });
