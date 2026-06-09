@@ -66,28 +66,15 @@ _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._
 
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
-        const imgBuffer = Buffer.from(await (await fetch(botLogo)).arrayBuffer());
-
+        // Alive වගේම url use කරපන්, buffer නෙවෙයි
         const sentMsg = await conn.sendMessage(from, {
-            image: imgBuffer,
+            image: { url: botLogo }, // <-- මෙතන වෙනස් කලේ
             caption: menuText,
             footer: "> © Ｐᴏᴡᴇʀᴇᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗",
             buttons: [
-                {
-                    buttonId: ".mainmenu",
-                    buttonText: { displayText: "😻 Main" },
-                    type: 1
-                },
-                {
-                    buttonId: ".ownermenu",
-                    buttonText: { displayText: "👑 Owner" },
-                    type: 1
-                },
-                {
-                    buttonId: ".downloadmenu",
-                    buttonText: { displayText: "🙊 Downloads" },
-                    type: 1
-                }
+                { buttonId: ".mainmenu", buttonText: { displayText: "😻 Main" }, type: 1 },
+                { buttonId: ".ownermenu", buttonText: { displayText: "👑 Owner" }, type: 1 },
+                { buttonId: ".downloadmenu", buttonText: { displayText: "🙊 Downloads" }, type: 1 }
             ],
             headerType: 4,
             contextInfo: {
@@ -98,7 +85,7 @@ _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._
                     newsletterName: "Ｒɪᴋᴀ Ｘᴍᴅ 🐉"
                 }
             }
-        }, { quoted: mek });
+        }); // <-- quoted: mek අයින් කලා
 
         const msgId = sentMsg.key.id;
         global.numberStore = global.numberStore || {};
@@ -127,7 +114,6 @@ const generateSubMenu = async (conn, mek, from, category, title, pushname, reply
                 cmdList += `│ ⊳ *${commands[i].pattern}*\n│ ${commands[i].desc || 'No Description'}\n│\n`;
             }
         }
-
         if (cmdList === '') cmdList = `│ ⊳ 𝐍ᴏ ᴄᴏᴍᴀɴᴅs ғᴏᴜɴᴅ.\n│\n`;
 
         let menuContent = `╭─── « 𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ3 » ───⟡
@@ -138,8 +124,7 @@ ${cmdList}╰───────────────⟡
 
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
-        const imgBuffer = Buffer.from(await (await fetch(botLogo)).arrayBuffer());
-        await conn.sendMessage(from, { image: imgBuffer, caption: menuContent }, { quoted: mek });
+        await conn.sendMessage(from, { image: { url: botLogo }, caption: menuContent });
     } catch (e) {
         reply('*❌ 𝐒ᴜʙᴍᴇɴᴜ ᴇʀᴏʀ!!*');
         console.log(e);
@@ -154,12 +139,10 @@ async(conn, mek, m, {from, pushname, reply}) => {
 │ ⊳ *𝐋ᴏɢᴏ ᴍᴀᴋᴇʀ ᴍᴇɴᴜ*
 │
 `;
-
         logoTypes.forEach((type, index) => {
             let num = (index + 1).toString().padStart(2, '0');
             logoList += `│ [ ${num} ] ${type.toUpperCase()}\n`;
         });
-
         logoList += `│
 ╰───────────────⟡
 
@@ -168,17 +151,13 @@ async(conn, mek, m, {from, pushname, reply}) => {
 
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
-        const imgBuffer = Buffer.from(await (await fetch(botLogo)).arrayBuffer());
-        const sentMsg = await conn.sendMessage(from, { image: imgBuffer, caption: logoList }, { quoted: mek });
-
+        const sentMsg = await conn.sendMessage(from, { image: { url: botLogo }, caption: logoList });
         const msgId = sentMsg.key.id;
         global.numberStore = global.numberStore || {};
         global.numberStore[msgId] = {};
-
         logoTypes.forEach((type, index) => {
             global.numberStore[msgId][(index + 1).toString()] = `genlogo ${type}&${pushname}`;
         });
-
     } catch (e) {
         reply('*❌ 𝐋ᴏɢᴏ ᴍᴇɴᴜ ᴇʀᴏʀ!*');
         console.log(e);
@@ -189,32 +168,26 @@ cmd({ pattern: "mainmenu", react: "⚡", dontAddCommandList: true, filename: __f
 async(conn, mek, m, {from, pushname, reply}) => {
     await generateSubMenu(conn, mek, from, 'main', '𝐌ᴀɪɴ ᴄᴏᴍᴀɴᴅs', pushname, reply);
 });
-
 cmd({ pattern: "ownermenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
     await generateSubMenu(conn, mek, from, 'owner', '𝐎ᴡɴᴇʀ ᴄᴏᴍᴀɴᴅs', pushname, reply);
 });
-
 cmd({ pattern: "groupmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
     await generateSubMenu(conn, mek, from, 'group', '𝐆ʀᴏᴜᴘ ᴄᴏᴍᴀɴᴅs', pushname, reply);
 });
-
 cmd({ pattern: "downloadmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
     await generateSubMenu(conn, mek, from, 'download', '𝐃ᴏᴡɴʟᴏᴀᴅᴇʀs', pushname, reply);
 });
-
 cmd({ pattern: "searchmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
     await generateSubMenu(conn, mek, from, 'search', '𝐒ᴇᴀʀᴄʜ ᴛᴏʟs', pushname, reply);
 });
-
 cmd({ pattern: "aimenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
     await generateSubMenu(conn, mek, from, 'ai', '𝐀ɪ ғᴇᴀᴛᴜʀᴇs', pushname, reply);
 });
-
 cmd({ pattern: "othermenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
     await generateSubMenu(conn, mek, from, 'other', '𝐎ᴛʜᴇʀ ᴜᴛɪʟɪᴛɪᴇs', pushname, reply);
