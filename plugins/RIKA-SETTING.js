@@ -6,27 +6,26 @@ const path = require('path');
 const configPath = path.join(__dirname, '../config.js');
 
 // ===============================
-// SAVE CONFIG
+// SAVE CONFIG (FIXED)
 // ===============================
-
 function saveConfig() {
 
     const newConfig =
-`module.exports = ${JSON.stringify(config, null, 4)}`;
+`module.exports = ${JSON.stringify(config, null, 4)};`;
 
     fs.writeFileSync(configPath, newConfig);
 
+    // reload config in memory
+    delete require.cache[require.resolve('../config')];
+    Object.assign(config, require('../config'));
 }
 
 // ===============================
 // OWNER CHECK
-// BOT CREATOR + PAIRED BOT NUMBER
 // ===============================
-
 function isOwner(senderNumber, conn) {
 
-    const botNumber =
-        conn.user.id.split(':')[0];
+    const botNumber = conn.user.id.split(':')[0];
 
     return (
         senderNumber === config.OWNER_NUMBER ||
@@ -37,299 +36,236 @@ function isOwner(senderNumber, conn) {
 // ===============================
 // AUTO STATUS READ
 // ===============================
-
 cmd({
     pattern: 'autostatusread',
     desc: 'Turn Auto Status Read ON/OFF',
     category: 'settings',
     react: '👁️'
 },
-async(conn, mek, m, {
-    args,
-    reply,
-    senderNumber
-}) => {
+async(conn, mek, m, { args, reply, senderNumber }) => {
 
-    if (!isOwner(senderNumber, conn)) {
-        return reply('❌ OWNER ONLY COMMAND');
-    }
+    if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
 
     if (!args[0]) {
-
         return reply(
 `Current Status:
 ${config.AUTO_READ_STATUS ? 'ON ✅' : 'OFF ❌'}
 
 Example:
-/autostatusread on`
+.autostatusread on`
         );
-
     }
 
-    const option =
-    args[0].toLowerCase();
+    const option = args[0].toLowerCase();
 
     if (option === 'on') {
-
         config.AUTO_READ_STATUS = true;
-
         saveConfig();
-
-        return reply(
-            '✅ AUTO STATUS READ ENABLED'
-        );
+        return reply('✅ AUTO STATUS READ ENABLED');
     }
 
     if (option === 'off') {
-
         config.AUTO_READ_STATUS = false;
-
         saveConfig();
-
-        return reply(
-            '❌ AUTO STATUS READ DISABLED'
-        );
+        return reply('❌ AUTO STATUS READ DISABLED');
     }
 
-    return reply('Use ON or OFF');
-
+    reply('Use ON or OFF');
 });
+
 
 // ===============================
 // AUTO REACT
 // ===============================
-
 cmd({
     pattern: 'autoreact',
     desc: 'Turn Auto React ON/OFF',
     category: 'settings',
     react: '❤️'
 },
-async(conn, mek, m, {
-    args,
-    reply,
-    senderNumber
-}) => {
+async(conn, mek, m, { args, reply, senderNumber }) => {
 
-    if (!isOwner(senderNumber, conn)) {
-        return reply('❌ OWNER ONLY COMMAND');
-    }
+    if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
 
     if (!args[0]) {
-
         return reply(
 `Current Status:
 ${config.AUTO_REACT ? 'ON ✅' : 'OFF ❌'}
 
 Example:
-/autoreact on`
+.autoreact on`
         );
-
     }
 
-    const option =
-    args[0].toLowerCase();
+    const option = args[0].toLowerCase();
 
     if (option === 'on') {
-
         config.AUTO_REACT = true;
-
         saveConfig();
-
-        return reply(
-            '✅ AUTO REACT ENABLED'
-        );
+        return reply('✅ AUTO REACT ENABLED');
     }
 
     if (option === 'off') {
-
         config.AUTO_REACT = false;
-
         saveConfig();
-
-        return reply(
-            '❌ AUTO REACT DISABLED'
-        );
+        return reply('❌ AUTO REACT DISABLED');
     }
 
-    return reply('Use ON or OFF');
-
+    reply('Use ON or OFF');
 });
+
 
 // ===============================
 // AUTO TYPING
 // ===============================
-
 cmd({
     pattern: 'autotyping',
     desc: 'Turn Auto Typing ON/OFF',
     category: 'settings',
     react: '⌨️'
 },
-async(conn, mek, m, {
-    args,
-    reply,
-    senderNumber
-}) => {
+async(conn, mek, m, { args, reply, senderNumber }) => {
 
-    if (!isOwner(senderNumber, conn)) {
-        return reply('❌ OWNER ONLY COMMAND');
-    }
+    if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
 
     if (!args[0]) {
-
         return reply(
 `Current Status:
 ${config.AUTO_TYPING ? 'ON ✅' : 'OFF ❌'}
 
 Example:
-/autotyping on`
+.autotyping on`
         );
-
     }
 
-    const option =
-    args[0].toLowerCase();
+    const option = args[0].toLowerCase();
 
     if (option === 'on') {
-
         config.AUTO_TYPING = true;
-
         saveConfig();
-
-        return reply(
-            '✅ AUTO TYPING ENABLED'
-        );
+        return reply('✅ AUTO TYPING ENABLED');
     }
 
     if (option === 'off') {
-
         config.AUTO_TYPING = false;
-
         saveConfig();
+        return reply('❌ AUTO TYPING DISABLED');
+    }
 
+    reply('Use ON or OFF');
+});
+
+
+// ===============================
+// 🔥 AUTO RECORDING (ADDED FIXED VERSION)
+// ===============================
+cmd({
+    pattern: 'autorecording',
+    desc: 'Turn Auto Recording ON/OFF',
+    category: 'settings',
+    react: '🎙️'
+},
+async(conn, mek, m, { args, reply, senderNumber }) => {
+
+    if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
+
+    if (!args[0]) {
         return reply(
-            '❌ AUTO TYPING DISABLED'
+`Current Status:
+${config.AUTO_RECORDING ? 'ON ✅' : 'OFF ❌'}
+
+Example:
+.autorecording on`
         );
     }
 
-    return reply('Use ON or OFF');
+    const option = args[0].toLowerCase();
 
+    if (option === 'on') {
+        config.AUTO_RECORDING = true;
+        saveConfig();
+        return reply('🎙️ AUTO RECORDING ENABLED');
+    }
+
+    if (option === 'off') {
+        config.AUTO_RECORDING = false;
+        saveConfig();
+        return reply('🎙️ AUTO RECORDING DISABLED');
+    }
+
+    reply('Use ON or OFF');
 });
+
 
 // ===============================
 // PREFIX CHANGE
 // ===============================
-
 cmd({
     pattern: 'setprefix',
     desc: 'Change Bot Prefix',
     category: 'settings',
     react: '⚙️'
 },
-async(conn, mek, m, {
-    args,
-    reply,
-    senderNumber
-}) => {
+async(conn, mek, m, { args, reply, senderNumber }) => {
 
-    if (!isOwner(senderNumber, conn)) {
-        return reply('❌ OWNER ONLY COMMAND');
-    }
+    if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
 
     if (!args[0]) {
-
         return reply(
 `Current Prefix:
 ${config.PREFIX}
 
 Example:
-/setprefix .`
+.setprefix .`
         );
-
     }
 
     config.PREFIX = args[0];
-
     saveConfig();
 
-    return reply(
-`✅ PREFIX CHANGED TO:
-${args[0]}`
-    );
-
+    reply(`✅ PREFIX CHANGED TO ${args[0]}`);
 });
+
 
 // ===============================
 // MODE CHANGE
 // ===============================
-
 cmd({
     pattern: 'mode',
     desc: 'Change Bot Mode',
     category: 'settings',
     react: '🛡️'
 },
-async(conn, mek, m, {
-    args,
-    reply,
-    senderNumber
-}) => {
+async(conn, mek, m, { args, reply, senderNumber }) => {
 
-    if (!isOwner(senderNumber, conn)) {
-        return reply('❌ OWNER ONLY COMMAND');
-    }
+    if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
 
     if (!args[0]) {
-
         return reply(
 `Current Mode:
-${config.MODE}
+${config.WORK_TYPE}
 
-Available Modes:
-• public
-• private
-• inbox
-• groups
-
-Example:
-/mode private`
+Modes:
+public | private | inbox | groups`
         );
     }
 
-    const mode =
-    args[0].toLowerCase();
+    const mode = args[0].toLowerCase();
 
-    const allowedModes = [
-        'public',
-        'private',
-        'inbox',
-        'groups'
-    ];
+    const allowed = ['public','private','inbox','groups'];
 
-    if (!allowedModes.includes(mode)) {
+    if (!allowed.includes(mode)) return reply('❌ INVALID MODE');
 
-        return reply(
-            '❌ INVALID MODE'
-        );
-
-    }
-
-    config.MODE = mode;
-
+    config.WORK_TYPE = mode;
     saveConfig();
 
-    return reply(
-`✅ BOT MODE CHANGED TO:
-${mode}`
-    );
-
+    reply(`✅ MODE CHANGED TO ${mode}`);
 });
+
 
 // ===============================
 // SETTINGS VIEW
 // ===============================
-
 cmd({
     pattern: 'settings',
     desc: 'Show Bot Settings',
@@ -341,23 +277,15 @@ async(conn, mek, m, { reply }) => {
     const text = `
 ╭━━〔 ${config.BOT_NAME} SETTINGS 〕━━⬣
 
-◈ PREFIX :
-${config.PREFIX}
+⚙️ PREFIX : ${config.PREFIX}
+🛡️ MODE : ${config.WORK_TYPE}
 
-◈ MODE :
-${config.MODE}
-
-◈ AUTO REACT :
-${config.AUTO_REACT ? 'ON ✅' : 'OFF ❌'}
-
-◈ AUTO TYPING :
-${config.AUTO_TYPING ? 'ON ✅' : 'OFF ❌'}
-
-◈ AUTO STATUS READ :
-${config.AUTO_READ_STATUS ? 'ON ✅' : 'OFF ❌'}
+🎙️ AUTO RECORDING : ${config.AUTO_RECORDING ? 'ON ✅' : 'OFF ❌'}
+⌨️ AUTO TYPING : ${config.AUTO_TYPING ? 'ON ✅' : 'OFF ❌'}
+👁️ AUTO STATUS READ : ${config.AUTO_READ_STATUS ? 'ON ✅' : 'OFF ❌'}
+❤️ AUTO REACT : ${config.AUTO_REACT ? 'ON ✅' : 'OFF ❌'}
 
 ╰━━━━━━━━━━━━━━⬣`;
 
-    return reply(text);
-
+    reply(text);
 });
