@@ -8,8 +8,7 @@ cmd({
   desc: "To Check bot's ping",
   category: "main",
   filename: __filename
-};
-
+},
 cmd(commandConfig, async (bot, message, args, { from,l,quoted,body,isCmd,command,argsArray,query,isGroup,sender,senderNumber,botNumber2,botNumber,pushname,isMe,isOwner,groupMetadata,groupName,participants,groupAdmins,isBotAdmins,isAdmins,
   reply
 }) => {
