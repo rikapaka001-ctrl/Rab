@@ -2,40 +2,45 @@ const config = require('../config')
 const { cmd, commands } = require('../command')
 
 cmd({
-    pattern: "ping",
-    desc: "Check bot's response time.",
-    category: "main",
-    react: "🚀",
-    filename: __filename
-},
-async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    try {
-        const startTime = Date.now();
-        
-       
-        const message = await conn.sendMessage(from, { text: '🐉 *𝐏ɪɴɢɪɴɢ ʀɪᴋᴀ xᴍᴅ 𝙫1..*' }, { quoted: mek });
-        
-        const endTime = Date.now();
-        const ping = endTime - startTime;
-        
-        
-        const pingText = `╭━━━〔 𝐑ɪᴋᴀ xᴍᴅ 〕━━━┈⊷
-┃ 🐉 𝐏 𝐎 𝐍 𝐆 !
-╰━━━━━━━━━━━━━━━┈⊷
+  pattern: "ping",
+  react: '🚶🏻',
+  alias: ["RIKA", "ping"],
+  desc: "To Check bot's ping",
+  category: "main",
+  filename: __filename
+};
 
-⭔ 𝙎𝙥𝙚𝙚𝙙 : ${ping}ms
-⭔ 𝙎𝙩𝙖𝙩𝙪𝙨 : 𝙁𝙖𝙨𝙩 & 𝘼𝙘𝙩𝙞𝙫𝙚 🟢
+cmd(commandConfig, async (bot, message, args, { from,l,quoted,body,isCmd,command,argsArray,query,isGroup,sender,senderNumber,botNumber2,botNumber,pushname,isMe,isOwner,groupMetadata,groupName,participants,groupAdmins,isBotAdmins,isAdmins,
+  reply
+}) => {
+  try {
+    var startTime = new Date().getTime();    
+    const initialMessage = { text: "*_Pinging to RIKA Module..._* ❗" };
+    let sentMessage = await bot.sendMessage(from, initialMessage);
+    var endTime = new Date().getTime();
+    const loadingStages = [
 
-> *© 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗*`;
+      "◍○○○○",
+      "◍◍○○○",
+      "◍◍◍○○",
+      "◍◍◍◍○",
+      "◍◍◍◍◍"
+    ];
 
-        
-        await conn.sendMessage(from, { text: pingText }, { quoted: message });
+    for (let stage of loadingStages) {
 
-    } catch (e) {
-        console.log(e);
-        reply(`Error: ${e}`);
+      await bot.sendMessage(from, { text: stage, edit: sentMessage.key });
     }
-})
+    return await bot.sendMessage(from, {
+
+      text: "📍️ *𝐑ɪᴋᴀ 𝐗ᴍᴅ 𝐒ᴘᴇᴇꜱ " + (endTime - startTime) + " Ms* ",
+      edit: sentMessage.key
+    });
+  } catch (error) {
+    reply("*Error !!*");
+    l(error);
+  }
+});
 cmd({
     pattern: "gay",
     desc: "Check gay percentage.",
