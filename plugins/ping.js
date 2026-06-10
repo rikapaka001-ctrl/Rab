@@ -39,7 +39,7 @@ cmd(commandConfig, async (bot, message, args, { from,l,quoted,body,isCmd,command
     reply("*Error !!*");
     l(error);
   }
-});
+})
 cmd({
     pattern: "gay",
     desc: "Check gay percentage.",
