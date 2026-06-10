@@ -1,12 +1,10 @@
 const { cmd } = require('../command');
 const axios = require('axios');
 
-const API_KEY = "a1e6a20d93870c1a985e431d28e52beafed68fed41028698f5c39948422ef12a";
-
 cmd({
     pattern: "tt",
     alias: ["tiktok", "ttdl", "tiktokdl"],
-    desc: "Download TikTok videos",
+    desc: "Download TikTok videos without watermark",
     category: "download",
     react: "🎵",
     filename: __filename
@@ -15,61 +13,54 @@ async (conn, mek, m, { from, q, reply }) => {
     try {
 
         if (!q) {
-            return reply("❌ Please provide a TikTok URL.");
+            return reply("❌ Please provide a TikTok URL.\n\nExample:\n.tt https://vt.tiktok.com/xxxxx/");
+        }
+
+        if (!q.includes("tiktok.com") && !q.includes("vt.tiktok.com")) {
+            return reply("❌ Invalid TikTok URL.");
         }
 
         await reply("⏳ *Downloading TikTok Video...*");
 
-        const { data } = await axios.get(
-            `https://back.asitha.top/api/tiktok/download?url=${encodeURIComponent(q)}&apiKey=${API_KEY}`
-        );
+        const api = `https://www.tikwm.com/api/?url=${encodeURIComponent(q)}`;
+        const { data } = await axios.get(api);
 
-        console.log("TT RESPONSE =>", JSON.stringify(data, null, 2));
-
-        const videoUrl =
-            data?.result?.video ||
-            data?.result?.play ||
-            data?.result?.nowm ||
-            data?.result?.download ||
-            data?.data?.video ||
-            data?.data?.play ||
-            data?.data?.nowm ||
-            data?.data?.download ||
-            data?.video ||
-            data?.url;
-
-        const title =
-            data?.result?.title ||
-            data?.data?.title ||
-            "TikTok Video";
-
-        if (!videoUrl) {
-            return reply("❌ Video URL not found.\nCheck Render logs.");
+        if (!data || !data.data || !data.data.play) {
+            return reply("❌ Failed to fetch video.");
         }
 
-        const caption = `╭━━━〔 💗 RIKA TT DL 🧸 〕━━━⬣
-┃ 🎵 TikTok Download Success
-┃ 📌 Title: ${title}
-┃ 👤 User: @${m.sender.split('@')[0]}
+        const videoUrl = data.data.play;
+        const title = data.data.title || "No Title";
+        const cover = data.data.cover;
+
+        const caption = `
+╭━━━〔 💗 *RIKA TT DL* 🧸 〕━━━⬣
+┃ 🎵 *TikTok Download Success*
+┃
+┃ 📌 *Title:* ${title}
+┃ ⚡ *Quality:* HD
+┃ 👤 *Requested By:* @${m.sender.split('@')[0]}
+┃ 🚀 *Status:* Completed
 ╰━━━━━━━━━━━━━━━━⬣
 
-> Powered By Shamika Denuwan`;
-
+> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗
+`;
         await conn.sendMessage(
             from,
             {
                 video: { url: videoUrl },
-                caption,
+                caption: caption,
                 mentions: [m.sender]
             },
             { quoted: mek }
         );
 
     } catch (e) {
-        console.log("TT ERROR =>", e?.response?.data || e);
+        console.log("TikTok Error:", e);
 
         reply(
-            `❌ Download Failed\n\n${e.message}`
+            `❌ *TikTok Download Failed*\n\n` +
+            `📛 Error: ${e.message}`
         );
     }
 });
