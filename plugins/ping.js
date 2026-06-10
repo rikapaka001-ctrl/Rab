@@ -4,7 +4,7 @@ const { cmd, commands } = require('../command')
 cmd({
   pattern: "ping",
   react: '🚶🏻',
-  alias: ["RIKA", "ping"],
+  alias: ["RIKAXMD", "ping"],
   desc: "To Check bot's ping",
   category: "main",
   filename: __filename
