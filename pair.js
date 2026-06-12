@@ -23,7 +23,7 @@ const {
     generateWAMessageFromContent,
     generateForwardMessageContent,
     S_WHATSAPP_NET
-} = require('@whiskeysockets/baileys');
+} = require('rika-baileys');
 
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, fetchJson } = require('./lib/functions');
 const { sms } = require('./lib/msg');
