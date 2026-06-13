@@ -1,6 +1,5 @@
-const axios = require("axios");
-const gplay = require("google-play-scraper");
-const { cmd } = require("../command"); // path එක වෙනස් වෙන්න පුළුවන්
+const { cmd } = require('../command');
+const axios = require('axios');
 
 cmd({
     pattern: "apk",
@@ -13,50 +12,34 @@ async (conn, mek, m, { from, q, reply }) => {
 
         if (!q) return reply("Example:\n.apk WhatsApp");
 
-        const results = await gplay.search({
-            term: q,
-            num: 1
-        });
+        const { data } = await axios.get(
+            `https://ws75.aptoide.com/api/7/apps/search/query=${encodeURIComponent(q)}/limit=1`
+        );
 
-        if (!results.length) {
+        if (!data?.datalist?.list?.length) {
             return reply("❌ App not found");
         }
 
-        const app = results[0];
-
-        const apiUrl = `https://ws75.aptoide.com/api/7/apps/search/query=${encodeURIComponent(app.title)}/limit=1`;
-
-        const { data } = await axios.get(apiUrl);
-
-        if (!data?.datalist?.list?.length) {
-            return reply("❌ APK not found");
-        }
-
-        const apk = data.datalist.list[0];
-
-        const caption = `
-📦 Name: ${apk.name}
-🏷 Package: ${apk.package}
-👨‍💻 Developer: ${apk.developer?.name || "Unknown"}
-📥 Size: ${(apk.size / 1024 / 1024).toFixed(2)} MB
-⭐ Rating: ${app.scoreText || "N/A"}
-`;
+        const app = data.datalist.list[0];
 
         await conn.sendMessage(
             from,
             {
                 document: {
-                    url: apk.file.path_alt
+                    url: app.file.path_alt
                 },
                 mimetype: "application/vnd.android.package-archive",
-                fileName: `${apk.name}.apk`,
-                caption
+                fileName: `${app.name}.apk`,
+                caption:
+`📦 ${app.name}
+👨‍💻 ${app.developer?.name || "Unknown"}
+📥 ${(app.size / 1024 / 1024).toFixed(2)} MB`
             },
             { quoted: mek }
         );
 
-    } catch (err) {
-        console.log(err);
-        reply("❌ Error: " + err.message);
+    } catch (e) {
+        console.log(e);
+        reply("❌ " + e.message);
     }
 });
