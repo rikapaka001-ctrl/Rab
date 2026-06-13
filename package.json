@@ -31,7 +31,6 @@
     "node-fetch": "^2.7.0",
     "cheerio": "^1.0.0-rc.12",
     "dxz-ytdl": "latest",
-    "google-play-scraper": "^10.1.2",
     "denethdev-ytmp3": "latest",
     "darksadas-yt-pornhub-scrape": "latest",
     "@spinzaf/freefire-api": "latest"
