@@ -1,4 +1,5 @@
-const axios = require("axios");
+const { cmd } = require('../command');
+const axios = require('axios');
 
 cmd({
     pattern: "apk",
