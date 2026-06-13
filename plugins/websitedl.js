@@ -11,9 +11,7 @@ async (conn, mek, m, { from, q, reply }) => {
     try {
 
         if (!q) {
-            return reply(
-                "*Example:*\n.web https://google.com"
-            );
+            return reply("*Example:*\n.web https://google.com");
         }
 
         await m.react("🌐");
@@ -22,16 +20,11 @@ async (conn, mek, m, { from, q, reply }) => {
 
         const { data } = await axios.get(api);
 
-await reply(JSON.stringify(data, null, 2).slice(0, 3000));
-return;
-        const result = data.result || data.data || data;
+        if (!data?.response?.isFinished) {
+            return reply("⌛ Website archive is still being generated. Try again in a few seconds.");
+        }
 
-        const downloadUrl =
-            result.download ||
-            result.url ||
-            result.zip ||
-            result.link ||
-            result.downloadUrl;
+        const downloadUrl = data?.response?.downloadUrl;
 
         if (!downloadUrl) {
             return reply("❌ Download link not found.");
@@ -40,7 +33,9 @@ return;
         await conn.sendMessage(
             from,
             {
-                document: { url: downloadUrl },
+                document: {
+                    url: downloadUrl
+                },
                 mimetype: "application/zip",
                 fileName: "website.zip",
                 caption: `🌐 Website Download\n🔗 ${q}`
@@ -52,6 +47,6 @@ return;
 
     } catch (e) {
         console.log(e);
-        reply("❌ " + e.message);
+        reply(`❌ ${e.message}`);
     }
 });
