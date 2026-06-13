@@ -22,8 +22,8 @@ async (conn, mek, m, { from, q, reply }) => {
 
         const { data } = await axios.get(api);
 
-        console.log("WEB API:", JSON.stringify(data, null, 2));
-
+await reply(JSON.stringify(data, null, 2).slice(0, 3000));
+return;
         const result = data.result || data.data || data;
 
         const downloadUrl =
