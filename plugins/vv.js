@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { cmd } = require('../command');
-const { downloadContentFromMessage } = require('@whiskeysocket/baileys');
+const { downloadContentFromMessage } = require('@dnuzi/baileys');
 
 const dbPath = path.join(__dirname, 'vv_trigger.json');
 
