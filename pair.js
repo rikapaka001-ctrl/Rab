@@ -253,10 +253,11 @@ async function Pair(number, res = null) {
         await fs.ensureDir(sessionPath);
 
         const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
-        const { version } = await fetchLatestBaileysVersion();
+        const { version } = await fetchLatestBaileysVersion(); 
+        const logger = pino({ level: 'silent' });
 
-const sock = makeWASocket({
-    version, 
+        const sock = makeWASocket({
+            version: [2, 3000, 1033105955], 
             auth: {
                 creds: state.creds,
                 keys: makeCacheableSignalKeyStore(state.keys, logger),
