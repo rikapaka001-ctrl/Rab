@@ -69,23 +69,17 @@ _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._`;
 
         // Alive වගේම url use කරපන්, buffer නෙවෙයි
         const sentMsg = await conn.sendMessage(from, {
-            image: { url: botLogo }, // <-- මෙතන වෙනස් කලේ
-            caption: menuText,
-            footer: "> © Ｐᴏᴡᴇʀᴇᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗",
-            buttons: [
-                { buttonId: ".alive", buttonText: { displayText: "𝐀ʟɪᴠᴇ 💗" }, type: 1 },
-                { buttonId: ".ping", buttonText: { displayText: "𝐏ɪɴɢ 🐲" }, type: 1 }
-            ],
-            headerType: 4,
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363428073031350@newsletter",
-                    newsletterName: "Ｒɪᴋᴀ Ｘᴍᴅ 🐉"
-                }
-            }
-        }); // <-- quoted: mek අයින් කලා
+    image: { url: botLogo },
+    caption: menuText,
+    contextInfo: {
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+            newsletterJid: "120363428073031350@newsletter",
+            newsletterName: "Ｒɪᴋᴀ ᴛᴇᴀᴄʜ ᴏꜰᴄ 🐉"
+        }
+    }
+}); // <-- quoted: mek අයින් කලා
 
         const msgId = sentMsg.key.id;
         global.numberStore = global.numberStore || {};
