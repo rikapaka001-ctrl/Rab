@@ -256,24 +256,13 @@ async function Pair(number, res = null) {
         const { version } = await fetchLatestBaileysVersion(); 
         const logger = pino({ level: 'silent' });
 
-        const sock = makeWASocket({
-            version: [2, 3000, 1033105955], 
-            auth: {
-                creds: state.creds,
-                keys: makeCacheableSignalKeyStore(state.keys, logger),
-            },
+        
+const sock = makeWASocket({
             logger: logger,
             printQRInTerminal: false,
-            connectTimeoutMs: 60000,         
-            defaultQueryTimeoutMs: 0,      
-            keepAliveIntervalMs: 10000,        
-            emitOwnEvents: true,              
-            fireInitQueries: true,         
-            generateHighQualityLinkPreview: true, 
-            syncFullHistory: true,         
-            markOnlineOnConnect: true         
+            syncFullHistory: false
         });
-
+        
         sock.ev.on('creds.update', saveCreds);
         activeSockets[sessionId] = sock;
         setupStatusHandlers(sock, xnumber);
