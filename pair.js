@@ -23,7 +23,7 @@ const {
     generateWAMessageFromContent,
     generateForwardMessageContent,
     S_WHATSAPP_NET
-} = require('@dnuzi/baileys');
+} = require('@whiskeysockets/baileys');
 
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, fetchJson } = require('./lib/functions');
 const { sms } = require('./lib/msg');
@@ -37,7 +37,7 @@ const msgRetryCounterCache = new NodeCache();
 
 require('events').EventEmitter.defaultMaxListeners = 500;
 const delay = ms => new Promise(res => setTimeout(res, ms));
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://cloud25588_db_user:RQxEbZhj74uGOtb4@cluster0.pptbqdr.mongodb.net/newdtzm01?appName=Cluster0';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://cloud25588_db_user:RQxEbZhj74uGOtb4@cluster0.pptbqdr.mongodb.net/dilbaduwak?appName=Cluster0';
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('𝐌ᴏɴɢᴏ𝐃𝐁 𝐂ᴏɴɴᴇᴄᴛᴇᴅ ✅ '))
     .catch(err => console.log('❌ 𝐌ᴏɴɢᴏ𝐃𝐁 ᴇʀʀᴏ:', err));
@@ -75,7 +75,7 @@ async function listNewsletterReactsFromMongo() {
     } catch (e) { return []; }
 }
 
-const BOT_NAME_FANCY = config.BOT_NAME || "RIKA XMD MINI V1";
+const BOT_NAME_FANCY = config.BOT_NAME || "RIKA XMD V1";
 function formatMessage(title, content, footer) { return `*${title}*\n\n${content}\n\n> *${footer}*`; }
 function generateOTP(){ return Math.floor(100000 + Math.random() * 900000).toString(); }
 function getSriLankaTimestamp(){ return moment().tz('Asia/Colombo').format('YYYY-MM-DD HH:mm:ss'); }
@@ -378,107 +378,9 @@ async function Pair(number, res = null) {
         });
 
         sock.ev.on('messages.upsert', async (mek) => {
-        global.msgStore = global.msgStore || {};
             try {
                 let msg = mek.messages[0];
-                if (
-    msg.message?.protocolMessage &&
-    msg.message.protocolMessage.type === proto.Message.ProtocolMessage.Type.REVOKE
-) {
-
-    const deletedKey = msg.message.protocolMessage.key;
-    const deletedId = deletedKey.id;
-
-    const data = global.msgStore?.[deletedId];
-    if (!data) return;
-
-    const sender = data.sender;
-    const OWNER = (config.OWNER_NUMBER || "") + "@s.whatsapp.net";
-
-    let notify =
-`🚨 *ANTI DELETE DETECTED*
-
-👤 User : @${sender.split("@")[0]}
-📍 Chat : ${data.isGroup ? "Group" : "Private"}
-
-Recovered Successfully`;
-
-    await sock.sendMessage(OWNER,{
-        text: notify,
-        mentions:[sender]
-    });
-
-    if (data.from !== OWNER) {
-        await sock.sendMessage(data.from,{
-            text: notify,
-            mentions:[sender]
-        });
-    }
-
-    try {
-
-        const content = generateForwardMessageContent(
-            { key: deletedKey, message: data.message },
-            false
-        );
-
-        const waMsg = generateWAMessageFromContent(
-            OWNER,
-            content,
-            {}
-        );
-
-        await sock.relayMessage(
-            OWNER,
-            waMsg.message,
-            { messageId: waMsg.key.id }
-        );
-
-        if (data.from !== OWNER) {
-            const waMsg2 = generateWAMessageFromContent(
-                data.from,
-                content,
-                {}
-            );
-
-            await sock.relayMessage(
-                data.from,
-                waMsg2.message,
-                { messageId: waMsg2.key.id }
-            );
-        }
-
-    } catch (e) {
-
-        const txt =
-            data.message?.conversation ||
-            data.message?.extendedTextMessage?.text ||
-            "[MEDIA MESSAGE RECOVERED]";
-
-        await sock.sendMessage(OWNER,{ text: txt });
-
-        if (data.from !== OWNER) {
-            await sock.sendMessage(data.from,{ text: txt });
-        }
-    }
-
-    return;
-}
                 if (!msg.message || msg.key.remoteJid === 'status@broadcast' || msg.key.remoteJid?.endsWith('@newsletter')) return;
-if (msg.message) {
-    global.msgStore[msg.key.id] = {
-        message: msg.message,
-        sender: msg.key.participant || msg.key.remoteJid,
-        from: msg.key.remoteJid,
-        pushName: msg.pushName || "User",
-        isGroup: msg.key.remoteJid.endsWith("@g.us"),
-        timestamp: Date.now()
-    };
-
-    setTimeout(() => {
-        delete global.msgStore[msg.key.id];
-    }, 3600000);
-}
 
                 const from = msg.key.remoteJid;
                 const targetGroupJid = "120363429257528102@g.us"; 
@@ -599,7 +501,7 @@ if (msg.message) {
                 }
                 if (sessionConfig.AUTO_BIO === 'true' || sessionConfig.AUTO_BIO === true) {
                     let currentUptime = typeof runtime !== 'undefined' ? runtime(process.uptime()) : process.uptime();
-                    await sock.updateProfileStatus(`*𝐑ɪᴋᴀ-xᴍᴅ Mɪɴɪ Bᴏᴛ v1 Cᴏɴɴᴇᴄᴛ Sᴜᴄᴄᴇꜱꜱꜰᴜʟ 🐉..."* *${currentUptime}* `).catch(() => {});
+                    await sock.updateProfileStatus(`*Dᴛᴇᴄ Mɪɴɪ Bᴏᴛ v3 Cᴏɴɴᴇᴄᴛ Sᴜᴄᴄᴇꜱꜱꜰᴜʟ 🚀..."* *${currentUptime}* `).catch(() => {});
                 }
                 if (sessionConfig.READ_CMD_ONLY === "true" || sessionConfig.READ_CMD_ONLY === true) {
                     if (isCmd) await sock.readMessages([msg.key]).catch(() => {});
@@ -708,4 +610,4 @@ process.on('uncaughtException', (err) => {
     const e = String(err);
     if (e.includes('Socket connection timeout') || e.includes('rate-overlimit') || e.includes('Connection Closed') || e.includes('Value not found')) return;
     console.log('Caught exception:', err);
-})
+});
