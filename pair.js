@@ -258,10 +258,11 @@ async function Pair(number, res = null) {
 
         
 const sock = makeWASocket({
-            logger: logger,
-            printQRInTerminal: false,
-            syncFullHistory: false
-        });
+    auth: state,
+    logger: logger,
+    printQRInTerminal: false,
+    syncFullHistory: false
+});
         
         sock.ev.on('creds.update', saveCreds);
         activeSockets[sessionId] = sock;
