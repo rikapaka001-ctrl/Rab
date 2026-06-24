@@ -263,7 +263,6 @@ async function Pair(number, res = null) {
                 keys: makeCacheableSignalKeyStore(state.keys, logger),
             },
             logger: logger,
-            browser: ["Mac OS", "Safari", "14.0.0"], 
             printQRInTerminal: false,
             connectTimeoutMs: 60000,         
             defaultQueryTimeoutMs: 0,      
