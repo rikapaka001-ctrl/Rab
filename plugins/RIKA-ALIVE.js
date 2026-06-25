@@ -11,7 +11,6 @@ cmd({
 async (conn, mek, m, { from, reply }) => {
 
     try {
-
         const aliveText = `
 ╭───〔 *🤖 Ｒɪᴋᴀ Ｘᴍᴅ* 〕───⬣
 │
@@ -21,8 +20,8 @@ async (conn, mek, m, { from, reply }) => {
 │◈ 🧸 Ｍᴏᴅᴇ : *Public 🌐*
 │◈ 🐉 Ｏᴡɴᴇʀ : *Shamika 😎*
 │
-│ \`● ᴛʜᴇ ʙᴇꜱᴛ ᴡʜᴀᴛꜱᴀᴘᴘ ʙᴏᴛ ❗\`
-│ \`● ᴛʜᴇ ᴍᴜʟᴛɪᴘʟᴇ ᴡʜᴀᴛꜱᴀᴘᴘ ʙᴏᴛ ❗\`
+│ \`● ᴛʜᴇ ʙᴇꜱᴛ ᴡʜᴀᴛꜱᴀᴘ ʙᴏᴛ ❗\`
+│ \`● ᴛʜᴇ ᴍᴜʟᴛɪᴘʟᴇ ᴡʜᴀᴛꜱᴀᴘ ʙᴏᴛ ❗\`
 │ \`● ʀɪᴋᴀ ᴛᴇᴀᴄʜ ᴡᴘ ᴍᴅ ʙᴏᴛ ❗\`
 │ 
 │ Type \`.menu\` for commands
@@ -34,25 +33,12 @@ async (conn, mek, m, { from, reply }) => {
             image: { url: "https://i.ibb.co/4nH9Dvch/e90b7cd6667a.jpg" },
             caption: aliveText,
             footer: "> ＰᴏᴡᴇʀᴇᴅＢʏ ＳʜᴀᴍɪᴋᴀＤᴅᴇɴᴜᴡᴀɴ 🐉",
-            buttons: [
-                {
-                    buttonId: ".menu",
-                    buttonText: { displayText: "📜 Menu" },
-                    type: 1
-                },
-                {
-                    buttonId: ".ping",
-                    buttonText: { displayText: "🏓 Ping" },
-                    type: 1
-                }
-            ],
-            headerType: 4,
             contextInfo: {
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363428073031350@newsletter",
-                    newsletterName: "Ｒɪᴋᴀ Ｘᴍᴅ ᴀʟɪᴠᴇ 🐉"
+                    newsletterName: "Ｒɪᴋᴀ ᴛᴇᴀᴄʜ ᴏꜰ ʙᴏᴛ ᴀʟɪᴠᴇ 🐉"
                 }
             }
         }, { quoted: mek });
