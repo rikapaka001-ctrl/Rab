@@ -244,7 +244,7 @@ async(conn, mek, m, { args, reply, senderNumber }) => {
 });
 
 // ===============================
-// SETTINGS VIEW - IMAGE + NEWSLETTER STYLE
+// SETTINGS VIEW - CHANNEL NEWSLETTER STYLE
 // ===============================
 cmd({
     pattern: 'settings',
@@ -281,17 +281,35 @@ async(conn, mek, m, { from, reply, senderNumber }) => {
 ╰────────────────⬣
 `;
 
-    await conn.sendMessage(from, {
-        image: { url: "https://files.catbox.moe/7z5x3q.jpg" },
-        caption: settingsText,
-        footer: "> ＰᴏᴡᴇʀᴇᴅＢʏ ＳʜᴀᴍɪᴋᴀＤᴇɴᴜᴡᴀɴ 🐉",
-        contextInfo: {
-            forwardingScore: 999,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-                newsletterJid: "120363428073031350@newsletter",
-                newsletterName: "Ｒɪᴋᴀ Ｘᴍᴅ Ｓᴇᴛɪɴɢꜱ ⚙️"
+    const channelJid = "120363428073031350@newsletter";
+    const channelName = "Ｒɪᴋᴀ Ｘᴍᴅ Ｃʜᴀɴᴇʟ 🐉";
+
+    try {
+        await conn.sendMessage(from, {
+            image: { url: "https://files.catbox.moe/7z5x3q.jpg" },
+            caption: settingsText,
+            footer: "> ＰᴏᴡᴇʀᴇᴅＢʏ ＳʜᴀᴍɪᴋᴀＤᴇɴᴜᴡᴀɴ 🐉",
+            contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: channelJid,
+                    newsletterName: channelName
+                }
             }
-        }
-    }, { quoted: mek });
+        }, { quoted: mek });
+    } catch (e) {
+        console.log("Settings Image Error:", e.message);
+        await conn.sendMessage(from, {
+            text: settingsText,
+            contextInfo: {
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: channelJid,
+                    newsletterName: channelName
+                }
+            }
+        }, { quoted: mek });
+    }
 });
