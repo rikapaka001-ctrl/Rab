@@ -137,7 +137,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 })
 
 cmd({
-    pattern: "getpic",
+    pattern: "getgpic",
     desc: "Get the group profile picture.",
     category: "group",
     react: "🖼️",
