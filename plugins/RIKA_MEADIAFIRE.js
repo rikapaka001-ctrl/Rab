@@ -10,7 +10,7 @@ function getQuery(args) {
 }
 
 cmd({
-    name: "mediafire",
+    pattern: "mediafire",
     alias: ["mf", "mfdl"],
     category: "download",
     fromMe: false,
