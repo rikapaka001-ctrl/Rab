@@ -1,13 +1,15 @@
 const config = require('../config')
 const { cmd } = require('../command')
 
-async function getGroupAdmins(conn, groupId) {
+async function checkAdmins(conn, groupId, senderJid) {
     const metadata = await conn.groupMetadata(groupId);
-    const botJid = conn.user.id.split(':')[0] + '@s.whatsapp.net'; // 26.4.0 fix
+    const botJid = conn.user.id.split(':')[0] + '@s.whatsapp.net';
     const admins = metadata.participants.filter(p => p.admin).map(p => p.id);
-    const isBotAdmin = admins.includes(botJid);
-    const isSenderAdmin = admins.includes(m.sender);
-    return { admins, isBotAdmin, isSenderAdmin };
+    return {
+        isBotAdmin: admins.includes(botJid),
+        isSenderAdmin: admins.includes(senderJid),
+        admins: admins
+    };
 }
 
 // ============= PROMOTE =============
@@ -22,14 +24,14 @@ async (conn, mek, m, { from, isGroup, reply }) => {
     try {
         if (!isGroup) return reply('❌ *Meka group ekaka witharai*')
 
-        const { isBotAdmin, isSenderAdmin } = await getGroupAdmins(conn, from);
+        const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
         if (!isBotAdmin) return reply('❌ *Bot eka admin karapan pahala*')
         if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
 
         const user = m.mentionedJid[0] || m.quoted?.sender
         if (!user) return reply('❌ *@tag karapan nathnam reply karapan*')
 
-        await conn.groupParticipantsUpdate(from,, 'promote')
+        await conn.groupParticipantsUpdate(from,, 'promote') // FIX: thiyenawa
         await reply(`🔼 @${user.split('@')[0]} *Admin karala* ✅`, { mentions: })
     } catch (e) {
         console.log(e)
@@ -49,14 +51,14 @@ async (conn, mek, m, { from, isGroup, reply }) => {
     try {
         if (!isGroup) return reply('❌ *Meka group ekaka witharai*')
 
-        const { isBotAdmin, isSenderAdmin } = await getGroupAdmins(conn, from);
+        const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
         if (!isBotAdmin) return reply('❌ *Bot eka admin karapan*')
         if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
 
         const user = m.mentionedJid[0] || m.quoted?.sender
         if (!user) return reply('❌ *@tag karapan nathnam reply karapan*')
 
-        await conn.groupParticipantsUpdate(from,, 'demote')
+        await conn.groupParticipantsUpdate(from,, 'demote') // FIX: thiyenawa
         await reply(`🔽 @${user.split('@')[0]} *Member karala* ✅`, { mentions: })
     } catch (e) {
         console.log(e)
@@ -76,7 +78,7 @@ async (conn, mek, m, { from, isGroup, reply }) => {
     try {
         if (!isGroup) return reply('❌ *Meka group ekaka witharai*')
 
-        const { isBotAdmin, isSenderAdmin } = await getGroupAdmins(conn, from);
+        const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
         if (!isBotAdmin) return reply('❌ *Bot eka admin karapan*')
         if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
 
@@ -84,7 +86,7 @@ async (conn, mek, m, { from, isGroup, reply }) => {
         if (!user) return reply('❌ *@tag karapan nathnam reply karapan*')
         if (user === m.sender) return reply('❌ *Nikan hari yako*')
 
-        await conn.groupParticipantsUpdate(from,, 'remove')
+        await conn.groupParticipantsUpdate(from,, 'remove') // FIX: thiyenawa
         await reply(`👢 @${user.split('@')[0]} *Aragatta* ✅`, { mentions: })
     } catch (e) {
         console.log(e)
@@ -103,7 +105,7 @@ cmd({
 async (conn, mek, m, { from, q, isGroup, reply }) => {
     if (!isGroup) return reply('❌ *Group ekaka witharai*')
 
-    const { isBotAdmin, isSenderAdmin, admins } = await getGroupAdmins(conn, from);
+    const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
     if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
     if (!isBotAdmin) return reply('❌ *Bot eka admin karapan*')
 
@@ -130,7 +132,7 @@ cmd({
 async (conn, mek, m, { from, q, isGroup, reply }) => {
     if (!isGroup) return reply('❌ *Group ekaka witharai*')
 
-    const { isSenderAdmin } = await getGroupAdmins(conn, from);
+    const { isSenderAdmin } = await checkAdmins(conn, from, m.sender);
     if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
 
     const metadata = await conn.groupMetadata(from);
