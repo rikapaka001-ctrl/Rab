@@ -27,9 +27,12 @@ async (conn, mek, m, { from, isGroup, reply }) => {
         const user = m.mentionedJid[0] || m.quoted?.sender
         if (!user) return reply('❌ *@tag karapan*')
 
-        await conn.groupParticipantsUpdate(from,, 'promote') // <-- MEKA HARI
+        await conn.groupParticipantsUpdate(from,, 'promote')
         await reply(`🔼 @${user.split('@')[0]} *Admin karala* ✅`, { mentions: })
-    } catch (e) { reply(`❌ Error: ${e.message}`) }
+    } catch (e) {
+        console.log(e)
+        reply(`❌ Error: ${e.message}`)
+    }
 })
 
 cmd({
@@ -48,9 +51,12 @@ async (conn, mek, m, { from, isGroup, reply }) => {
         const user = m.mentionedJid[0] || m.quoted?.sender
         if (!user) return reply('❌ *@tag karapan*')
 
-        await conn.groupParticipantsUpdate(from,, 'demote') // <-- MEKA HARI
+        await conn.groupParticipantsUpdate(from,, 'demote')
         await reply(`🔽 @${user.split('@')[0]} *Member karala* ✅`, { mentions: })
-    } catch (e) { reply(`❌ Error: ${e.message}`) }
+    } catch (e) {
+        console.log(e)
+        reply(`❌ Error: ${e.message}`)
+    }
 })
 
 cmd({
@@ -70,9 +76,12 @@ async (conn, mek, m, { from, isGroup, reply }) => {
         if (!user) return reply('❌ *@tag karapan*')
         if (user === m.sender) return reply('❌ *Nikan hari yako*')
 
-        await conn.groupParticipantsUpdate(from,, 'remove') // <-- MEKA HARI
+        await conn.groupParticipantsUpdate(from,, 'remove')
         await reply(`👢 @${user.split('@')[0]} *Aragatta* ✅`, { mentions: })
-    } catch (e) { reply(`❌ Error: ${e.message}`) }
+    } catch (e) {
+        console.log(e)
+        reply(`❌ Error: ${e.message}`)
+    }
 })
 
 cmd({
