@@ -259,34 +259,47 @@ async(conn, mek, m, { from, reply, senderNumber }) => {
     const status = (val) => val === true? 'ON ✅' : 'OFF ❌';
 
     const settingsText = `
-╭───〔 *⚙️ ${config.BOT_NAME} SETTINGS* 〕───⬣
+╭───〔 *⚙️ ${config.BOT_NAME} ꜱᴇᴛᴛɪɴɢꜱ* 〕───⬣
 │
-│ ◈ *PREFIX*: [${config.PREFIX}]
-│ ◈ *MODE*: ${config.WORK_TYPE}
-│ ◈ *OWNER*: ${config.OWNER_NUMBER}
+│ ◈ *Ｐʀᴇꜰɪx*: [${config.PREFIX}]
+⌥ .setprefix / . *
+│ ◈ *Ｍᴏᴅᴇ*: ${config.WORK_TYPE}
+⌥ .mode private / public / inbox
+│ ◈ *Ｏᴡɴᴇʀ*: ${config.OWNER_NUMBER}
 │
-│ *🎙️ AUTO RECORDING*: ${status(config.AUTO_RECORDING)}
-│ *⌨️ AUTO TYPING*: ${status(config.AUTO_TYPING)}
-│ *👁️ AUTO STATUS READ*: ${status(config.AUTO_READ_STATUS)}
-│ *❤️ AUTO REACT*: ${status(config.AUTO_REACT)}
-│ *🔗 ANTI LINK*: ${status(config.ANTI_LINK)}
-│ *🤖 ANTI BOT*: ${status(config.ANTI_BOT)}
-│ *💬 ANTI BAD*: ${status(config.ANTI_BAD)}
-│ *🌐 ALWAYS ONLINE*: ${status(config.ALWAYS_ONLINE)}
-│ *🌙 ALWAYS OFFLINE*: ${status(config.ALWAYS_OFFLINE)}
-│ *📖 READ CMD ONLY*: ${status(config.READ_CMD_ONLY)}
+│ *🎙️Ａᴜᴛᴏ ʀᴇᴄᴏʀᴅɪɴɢ*: ${status(config.AUTO_RECORDING)}
+⌥ .autorecording on / off
+│ *⌨️ Ａᴜᴛᴏ ᴛʏᴘɪɴɢ*: ${status(config.AUTO_TYPING)}
+⌥ .autotyping on / of
+│ *👁️ Ａᴜᴛᴏ ꜱᴛᴀᴛᴜꜱ ʀᴇᴀᴅ*: ${status(config.AUTO_READ_STATUS)}
+⌥ .autostatusread on / off
+│ *❤️ Ａᴜᴛᴏ ʀᴇᴀᴄᴛ*: ${status(config.AUTO_REACT)}
+⌥ .autoreact on / off
+│ *🔗 Ａɴᴛɪ ʟɪɴᴋ*: ${status(config.ANTI_LINK)}
+⌥ .antilink on / off
+│ *🤖 Ａɴᴛɪ ʙᴏᴛ*: ${status(config.ANTI_BOT)}
+⌥ .antibot on / off
+│ *💬 Ａɴᴛɪ ʙᴀᴅ*: ${status(config.ANTI_BAD)}
+⌥ .antibot on / off
+│ *🌐 Ａʟᴡᴀʏꜱ ᴏɴʟɪɴᴇ*: ${status(config.ALWAYS_ONLINE)}
+⌥ .alwaysonline on / off
+│ *🌙 Ａʟᴡᴀʏꜱ ᴏꜰꜰʟɪɴᴇ*: ${status(config.ALWAYS_OFFLINE)}
+⌥ .alwaysoffline on / off
+│ *📖 Ｒᴇᴀᴅ ᴄᴍᴅ ᴏɴʟʏ*: ${status(config.READ_CMD_ONLY)}
+⌥ .readcmdonly on / off
 │
 │ \`💡 Toggle:.autotyping on/off\`
 │
+> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗
 ╰────────────────⬣
 `;
 
     const channelJid = "120363428073031350@newsletter";
-    const channelName = "Ｒɪᴋᴀ Ｘᴍᴅ Ｃʜᴀɴᴇʟ 🐉";
+    const channelName = "Ｒɪᴋᴀ xᴍᴅ ꜱᴇᴛᴛɪɴɢꜱ 🐉";
 
     try {
         await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/7z5x3q.jpg" },
+            image: { url: "https://i.ibb.co/wZrNj38d/6fecc5463333.jpg" },
             caption: settingsText,
             footer: "> ＰᴏᴡᴇʀᴇᴅＢʏ ＳʜᴀᴍɪᴋᴀＤᴇɴᴜᴡᴀɴ 🐉",
             contextInfo: {
