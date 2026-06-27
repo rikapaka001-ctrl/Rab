@@ -1,116 +1,156 @@
 const config = require('../config')
-const { cmd } = require('../command')
-
-async function checkAdmins(conn, groupId, senderJid) {
-    const metadata = await conn.groupMetadata(groupId);
-    const botJid = conn.user.id.split(':')[0] + '@s.whatsapp.net';
-    const admins = metadata.participants.filter(p => p.admin).map(p => p.id);
-    return {
-        isBotAdmin: admins.includes(botJid),
-        isSenderAdmin: admins.includes(senderJid)
-    };
-}
+const { cmd, commands } = require('../command')
 
 cmd({
     pattern: "promote",
-    alias: ["p"],
     desc: "Promote a member to admin.",
     category: "group",
-    react: "🔼"
+    react: "🔼",
+    filename: __filename
 },
-async (conn, mek, m, { from, isGroup, reply }) => {
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        if (!isGroup) return reply('❌ *Meka group ekaka witharai*')
-        const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
-        if (!isBotAdmin) return reply('❌ *Bot eka admin karapan pahala*')
-        if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
-        const user = m.mentionedJid[0] || m.quoted?.sender
-        if (!user) return reply('❌ *@tag karapan*')
+        if (!isGroup) return reply('This command can only be used in a group.')
+   
+        const user = m.mentioned[0] || m.quoted?.sender
+        if (!user) return reply('Please tag or reply to a user to promote.')
 
-        await conn.groupParticipantsUpdate(from,, 'promote') // <-- MEKA BALANNA [] THIYENAWADA KIYALA
-        await reply(`🔼 @${user.split('@')[0]} *Admin karala* ✅`, { mentions: })
-    } catch (e) { reply(`❌ Error: ${e.message}`) }
+        await conn.groupParticipantsUpdate(from, [user], 'promote')
+        await reply(`@${user.split('@')[0]} has been promoted to admin.`, { mentions: [user] })
+    } catch (e) {
+        console.log(e)
+        reply(`${e}`)
+    }
 })
 
 cmd({
     pattern: "demote",
-    alias: ["d"],
     desc: "Demote an admin to member.",
     category: "group",
-    react: "🔽"
+    react: "🔽",
+    filename: __filename
 },
-async (conn, mek, m, { from, isGroup, reply }) => {
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        if (!isGroup) return reply('❌ *Meka group ekaka witharai*')
-        const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
-        if (!isBotAdmin) return reply('❌ *Bot eka admin karapan*')
-        if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
-        const user = m.mentionedJid[0] || m.quoted?.sender
-        if (!user) return reply('❌ *@tag karapan*')
+        if (!isGroup) return reply('This command can only be used in a group.')
 
-        await conn.groupParticipantsUpdate(from,, 'demote')
-        await reply(`🔽 @${user.split('@')[0]} *Member karala* ✅`, { mentions: })
-    } catch (e) { reply(`❌ Error: ${e.message}`) }
+        const user = m.mentioned[0] || m.quoted?.sender
+        if (!user) return reply('Please tag or reply to a user to demote.')
+
+        await conn.groupParticipantsUpdate(from, [user], 'demote')
+        await reply(`@${user.split('@')[0]} has been demoted to member.`, { mentions: [user] })
+    } catch (e) {
+        console.log(e)
+        reply(`${e}`)
+    }
 })
-
 cmd({
-    pattern: "kick",
-    alias: ["remove", "ban"],
+    pattern: "remove",
     desc: "Remove a member from the group.",
     category: "group",
-    react: "👢"
+    react: "🚫",
+    filename: __filename
 },
-async (conn, mek, m, { from, isGroup, reply }) => {
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        if (!isGroup) return reply('❌ *Meka group ekaka witharai*')
-        const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
-        if (!isBotAdmin) return reply('❌ *Bot eka admin karapan*')
-        if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
-        const user = m.mentionedJid[0] || m.quoted?.sender
-        if (!user) return reply('❌ *@tag karapan*')
-        if (user === m.sender) return reply('❌ *Nikan hari yako*')
+        if (!isGroup) return reply('This command can only be used in a group.')
+        
+        const user = m.mentioned[0] || m.quoted?.sender
+        if (!user) return reply('Please tag or reply to a user to remove.')
 
-        await conn.groupParticipantsUpdate(from,, 'remove')
-        await reply(`👢 @${user.split('@')[0]} *Aragatta* ✅`, { mentions: })
-    } catch (e) { reply(`❌ Error: ${e.message}`) }
+        await conn.groupParticipantsUpdate(from, [user], 'remove')
+        await reply(`@${user.split('@')[0]} has been removed from the group.`, { mentions: [user] })
+    } catch (e) {
+        console.log(e)
+        reply(`${e}`)
+    }
 })
 
 cmd({
-    pattern: "tagall",
-    alias: ["hidetag", "everyone"],
-    desc: "Tag all members",
+    pattern: "add",
+    desc: "Add a member to the group.",
     category: "group",
-    react: "📢"
+    react: "➕",
+    filename: __filename
 },
-async (conn, mek, m, { from, q, isGroup, reply }) => {
-    if (!isGroup) return reply('❌ *Group ekaka witharai*')
-    const { isSenderAdmin } = await checkAdmins(conn, from, m.sender);
-    if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
-    const metadata = await conn.groupMetadata(from);
-    let members = metadata.participants.map(u => u.id)
-    let msg = q || '📢 Attention Everyone!'
-    let text = `╭───〔 *TAG ALL* 〕───⬣\n│\n│ 💬 ${msg}\n│\n`
-    members.forEach(mem => text += `│ 👉 @${mem.split('@')[0]}\n`)
-    text += `╰────────────────⬣`
-    await conn.sendMessage(from, { text, mentions: members }, { quoted: mek })
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        if (!isGroup) return reply('This command can only be used in a group.')
+      
+        const user = q.split(' ')[0]
+        if (!user) return reply('Please provide a phone number to add.')
+
+        await conn.groupParticipantsUpdate(from, [`${user}@s.whatsapp.net`], 'add')
+        await reply(`@${user} has been added to the group.`, { mentions: [`${user}@s.whatsapp.net`] })
+    } catch (e) {
+        console.log(e)
+        reply(`${e}`)
+    }
 })
 
 cmd({
-    pattern: "tagadmin",
-    alias: ["admins"],
-    desc: "Tag all admins",
+    pattern: "setgoodbye",
+    desc: "Set the goodbye message for the group.",
     category: "group",
-    react: "👑"
+    react: "👋",
+    filename: __filename
 },
-async (conn, mek, m, { from, q, isGroup, reply }) => {
-    if (!isGroup) return reply('❌ *Group ekaka witharai*')
-    const { isSenderAdmin } = await checkAdmins(conn, from, m.sender);
-    if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
-    const metadata = await conn.groupMetadata(from);
-    let admins = metadata.participants.filter(p => p.admin).map(u => u.id)
-    let msg = q || '👑 Calling Admins!'
-    let text = `╭───〔 *TAG ADMINS* 〕───⬣\n│\n│ 💬 ${msg}\n│\n`
-    admins.forEach(adm => text += `│ 👑 @${adm.split('@')[0]}\n`)
-    text += `╰────────────────⬣`
-    await conn.sendMessage(from, { text, mentions: admins }, { quoted: mek })
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        if (!isGroup) return reply('This command can only be used in a group.')
+        if (!isBotAdmins) return reply('Bot must be an admin to use this command.')
+        if (!isAdmins) return reply('You must be an admin to use this command.')
+
+        const goodbye = q
+        if (!goodbye) return reply('Please provide a goodbye message.')
+
+        await conn.sendMessage(from, { image: { url: config.ALIVE_IMG }, caption: goodbye })
+        await reply('Goodbye message has been set.')
+    } catch (e) {
+        console.log(e)
+        reply(`${e}`)
+    }
+})
+
+cmd({
+    pattern: "setwelcome",
+    desc: "Set the welcome message for the group.",
+    category: "group",
+    react: "👋",
+    filename: __filename
+},
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        if (!isGroup) return reply('This command can only be used in a group.')
+        if (!isBotAdmins) return reply('Bot must be an admin to use this command.')
+        if (!isAdmins) return reply('You must be an admin to use this command.')
+
+        const welcome = q
+        if (!welcome) return reply('Please provide a welcome message.')
+
+        await conn.sendMessage(from, { image: { url: config.ALIVE_IMG }, caption: welcome })
+        await reply('Welcome message has been set.')
+    } catch (e) {
+        console.log(e)
+        reply(`${e}`)
+    }
+})
+
+cmd({
+    pattern: "getpic",
+    desc: "Get the group profile picture.",
+    category: "group",
+    react: "🖼️",
+    filename: __filename
+},
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    try {
+        if (!isGroup) return reply('This command can only be used in a group.')
+
+        const groupPic = await conn.getProfilePicture(from)
+        await conn.sendMessage(from, { image: { url: groupPic }, caption: 'Group Profile Picture' })
+    } catch (e) {
+        console.log(e)
+        reply(`${e}`)
+    }
 })
