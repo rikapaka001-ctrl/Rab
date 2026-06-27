@@ -10,7 +10,7 @@ function getQuery(args) {
 }
 
 cmd({
-    name: "boom",
+    pattern: "boom",
     alias: ["bomb", "spam", "mass"],
     category: "tools",
     fromMe: false,
