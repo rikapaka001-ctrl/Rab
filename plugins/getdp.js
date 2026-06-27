@@ -9,7 +9,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 cmd({
-    name: "getdp",
+    pattern: "getdp",
     alias: ["dp", "getprofile"],
     category: "tools",
     fromMe: false,
