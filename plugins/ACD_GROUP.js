@@ -7,12 +7,10 @@ async function checkAdmins(conn, groupId, senderJid) {
     const admins = metadata.participants.filter(p => p.admin).map(p => p.id);
     return {
         isBotAdmin: admins.includes(botJid),
-        isSenderAdmin: admins.includes(senderJid),
-        admins: admins
+        isSenderAdmin: admins.includes(senderJid)
     };
 }
 
-// ============= PROMOTE =============
 cmd({
     pattern: "promote",
     alias: ["p"],
@@ -23,23 +21,17 @@ cmd({
 async (conn, mek, m, { from, isGroup, reply }) => {
     try {
         if (!isGroup) return reply('❌ *Meka group ekaka witharai*')
-
         const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
         if (!isBotAdmin) return reply('❌ *Bot eka admin karapan pahala*')
         if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
-
         const user = m.mentionedJid[0] || m.quoted?.sender
-        if (!user) return reply('❌ *@tag karapan nathnam reply karapan*')
+        if (!user) return reply('❌ *@tag karapan*')
 
-        await conn.groupParticipantsUpdate(from,, 'promote') // FIX: thiyenawa
+        await conn.groupParticipantsUpdate(from,, 'promote') // <-- MEKA HARI
         await reply(`🔼 @${user.split('@')[0]} *Admin karala* ✅`, { mentions: })
-    } catch (e) {
-        console.log(e)
-        reply(`❌ Error: ${e.message || e}`)
-    }
+    } catch (e) { reply(`❌ Error: ${e.message}`) }
 })
 
-// ============= DEMOTE =============
 cmd({
     pattern: "demote",
     alias: ["d"],
@@ -50,23 +42,17 @@ cmd({
 async (conn, mek, m, { from, isGroup, reply }) => {
     try {
         if (!isGroup) return reply('❌ *Meka group ekaka witharai*')
-
         const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
         if (!isBotAdmin) return reply('❌ *Bot eka admin karapan*')
         if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
-
         const user = m.mentionedJid[0] || m.quoted?.sender
-        if (!user) return reply('❌ *@tag karapan nathnam reply karapan*')
+        if (!user) return reply('❌ *@tag karapan*')
 
-        await conn.groupParticipantsUpdate(from,, 'demote') // FIX: thiyenawa
+        await conn.groupParticipantsUpdate(from,, 'demote') // <-- MEKA HARI
         await reply(`🔽 @${user.split('@')[0]} *Member karala* ✅`, { mentions: })
-    } catch (e) {
-        console.log(e)
-        reply(`❌ Error: ${e.message || e}`)
-    }
+    } catch (e) { reply(`❌ Error: ${e.message}`) }
 })
 
-// ============= KICK =============
 cmd({
     pattern: "kick",
     alias: ["remove", "ban"],
@@ -77,24 +63,18 @@ cmd({
 async (conn, mek, m, { from, isGroup, reply }) => {
     try {
         if (!isGroup) return reply('❌ *Meka group ekaka witharai*')
-
         const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
         if (!isBotAdmin) return reply('❌ *Bot eka admin karapan*')
         if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
-
         const user = m.mentionedJid[0] || m.quoted?.sender
-        if (!user) return reply('❌ *@tag karapan nathnam reply karapan*')
+        if (!user) return reply('❌ *@tag karapan*')
         if (user === m.sender) return reply('❌ *Nikan hari yako*')
 
-        await conn.groupParticipantsUpdate(from,, 'remove') // FIX: thiyenawa
+        await conn.groupParticipantsUpdate(from,, 'remove') // <-- MEKA HARI
         await reply(`👢 @${user.split('@')[0]} *Aragatta* ✅`, { mentions: })
-    } catch (e) {
-        console.log(e)
-        reply(`❌ Error: ${e.message || e}`)
-    }
+    } catch (e) { reply(`❌ Error: ${e.message}`) }
 })
 
-// ============= TAGALL / HIDETAG =============
 cmd({
     pattern: "tagall",
     alias: ["hidetag", "everyone"],
@@ -104,24 +84,17 @@ cmd({
 },
 async (conn, mek, m, { from, q, isGroup, reply }) => {
     if (!isGroup) return reply('❌ *Group ekaka witharai*')
-
-    const { isBotAdmin, isSenderAdmin } = await checkAdmins(conn, from, m.sender);
+    const { isSenderAdmin } = await checkAdmins(conn, from, m.sender);
     if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
-    if (!isBotAdmin) return reply('❌ *Bot eka admin karapan*')
-
     const metadata = await conn.groupMetadata(from);
     let members = metadata.participants.map(u => u.id)
-    if (members.length === 0) return reply('❌ *Members data nathi*')
-
     let msg = q || '📢 Attention Everyone!'
     let text = `╭───〔 *TAG ALL* 〕───⬣\n│\n│ 💬 ${msg}\n│\n`
     members.forEach(mem => text += `│ 👉 @${mem.split('@')[0]}\n`)
-    text += `╰────────────────⬣\n> ＰᴏᴡᴇʀᴇᴅＢʏ ＳʜᴀᴍɪᴋᴀＤᴇɴᴜᴡᴀɴ 🐉`
-
+    text += `╰────────────────⬣`
     await conn.sendMessage(from, { text, mentions: members }, { quoted: mek })
 })
 
-// ============= TAG ADMINS =============
 cmd({
     pattern: "tagadmin",
     alias: ["admins"],
@@ -131,18 +104,13 @@ cmd({
 },
 async (conn, mek, m, { from, q, isGroup, reply }) => {
     if (!isGroup) return reply('❌ *Group ekaka witharai*')
-
     const { isSenderAdmin } = await checkAdmins(conn, from, m.sender);
     if (!isSenderAdmin) return reply('❌ *Admins lata witharai*')
-
     const metadata = await conn.groupMetadata(from);
     let admins = metadata.participants.filter(p => p.admin).map(u => u.id)
-    if (admins.length === 0) return reply('❌ *Admins na*')
-
     let msg = q || '👑 Calling Admins!'
     let text = `╭───〔 *TAG ADMINS* 〕───⬣\n│\n│ 💬 ${msg}\n│\n`
     admins.forEach(adm => text += `│ 👑 @${adm.split('@')[0]}\n`)
     text += `╰────────────────⬣`
-
     await conn.sendMessage(from, { text, mentions: admins }, { quoted: mek })
 })
