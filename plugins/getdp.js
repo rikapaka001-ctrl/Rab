@@ -26,8 +26,8 @@ cmd({
     if (!number || number.length < 10) {
         return m.reply(`📸 *Profile Fetcher*
 
-*Usage:* .getdp94712345678
-*Example:* .getdp94753518443`);
+*Usage:* .getdp 94766619362
+*Example:* .getdp 94766619363`);
     }
 
     let jid = number + '@s.whatsapp.net';
@@ -86,7 +86,7 @@ cmd({
         // Clear cache after 5 minutes (already handled)
         setTimeout(() => global.dpCache.delete(number), CACHE_TTL);
 
-        let caption = `📸 *WhatsApp Profile*\n\n📞 *${number}*\n👤 *${name}*\n📝 *About:* ${about}\n\n> SADEW-MINI`;
+        let caption = `📸 *WhatsApp Profile*\n\n📞 *${number}*\n👤 *${name}*\n📝 *About:* ${about}\n\n> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
         if (ppUrl) {
             // Download image with axios to avoid extra API calls
