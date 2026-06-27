@@ -27,12 +27,9 @@ async (conn, mek, m, { from, isGroup, reply }) => {
         const user = m.mentionedJid[0] || m.quoted?.sender
         if (!user) return reply('❌ *@tag karapan*')
 
-        await conn.groupParticipantsUpdate(from,, 'promote')
+        await conn.groupParticipantsUpdate(from,, 'promote') // <-- MEKA BALANNA [] THIYENAWADA KIYALA
         await reply(`🔼 @${user.split('@')[0]} *Admin karala* ✅`, { mentions: })
-    } catch (e) {
-        console.log(e)
-        reply(`❌ Error: ${e.message}`)
-    }
+    } catch (e) { reply(`❌ Error: ${e.message}`) }
 })
 
 cmd({
@@ -53,10 +50,7 @@ async (conn, mek, m, { from, isGroup, reply }) => {
 
         await conn.groupParticipantsUpdate(from,, 'demote')
         await reply(`🔽 @${user.split('@')[0]} *Member karala* ✅`, { mentions: })
-    } catch (e) {
-        console.log(e)
-        reply(`❌ Error: ${e.message}`)
-    }
+    } catch (e) { reply(`❌ Error: ${e.message}`) }
 })
 
 cmd({
@@ -78,10 +72,7 @@ async (conn, mek, m, { from, isGroup, reply }) => {
 
         await conn.groupParticipantsUpdate(from,, 'remove')
         await reply(`👢 @${user.split('@')[0]} *Aragatta* ✅`, { mentions: })
-    } catch (e) {
-        console.log(e)
-        reply(`❌ Error: ${e.message}`)
-    }
+    } catch (e) { reply(`❌ Error: ${e.message}`) }
 })
 
 cmd({
