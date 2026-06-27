@@ -1,7 +1,7 @@
 module.exports = {
     PREFIX: ".",
     OWNER_NUMBER: "94766619363",
-    BOT_NAME: "RIKA XMD MINI V1",
+    BOT_NAME: "Ｒɪᴋᴀ xᴍᴅ V3",
     WORK_TYPE: "public",
 
     AUTO_TYPING: false,
