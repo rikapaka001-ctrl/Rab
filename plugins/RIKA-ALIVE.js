@@ -30,7 +30,7 @@ async (conn, mek, m, { from, reply }) => {
 `;
 
         await conn.sendMessage(from, {
-            image: { url: "https://i.ibb.co/4nH9Dvch/e90b7cd6667a.jpg" },
+            image: { url: "https://i.ibb.co/ycY7Nyg6/4f7c2504e62e.jpg" },
             caption: aliveText,
             footer: "> ＰᴏᴡᴇʀᴇᴅＢʏ ＳʜᴀᴍɪᴋᴀＤᴅᴇɴᴜᴡᴀɴ 🐉",
             contextInfo: {
