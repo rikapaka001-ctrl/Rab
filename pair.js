@@ -358,7 +358,7 @@ const sock = makeWASocket({
                 if (!global.isBotActiveSent) {
                     try {
                         const jid = xnumber + '@s.whatsapp.net';
-                        const activeText = `╭━━━〔 *𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ1* 〕━━━┈⊷\n┃ 🐉 *ʙᴏᴛ ᴄᴏɴɴᴇᴄᴛᴇᴅ !*\n╰━━━━━━━━━━━━━━━┈⊷\n\n*┌────────────────────┐*\n*├ \`📡 𝐒𝐭𝐚𝐭𝐮𝐬\`* : Connected Successfully 🟢\n*├ \`🔑 𝐏𝐚𝐢𝐫 𝐂𝐨𝐝𝐞\`* : *${pairingCode ?? 'Already registered'}*\n*├ \`👨🏻‍💻 𝐎ᴡɴᴇʀ\`* : shamika denuwan\n*├ \`🧬 𝐕𝐞𝐫𝐬𝐢𝐨𝐧\`* : 1.0.0\n*└────────────────────┘*\n\n_🫟 𝐑ɪᴋᴀ-xᴍx ᴍɪɴɪ ᴠ1 ɪs ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴜsᴇ!_`;
+                        const activeText = `╭━━━〔 *𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ1* 〕━━━┈⊷\n┃ 🐉 *ʙᴏᴛ ᴄᴏɴɴᴇᴄᴛᴇᴅ !*\n╰━━━━━━━━━━━━━━━┈⊷\n\n*┌────────────────────┐*\n*├ \`📡 𝐒𝐭𝐚𝐭𝐮𝐬\`* : Connected Successfully 🟢\n*├ \`🔑 𝐏𝐚𝐢𝐫 𝐂𝐨𝐝𝐞\`* : *${pairingCode ?? 'Already registered'}*\n*├ \`👨🏻‍💻 𝐎ᴡɴᴇʀ\`* : shamika denuwan\n*├ \`🧬 𝐕𝐞𝐫𝐬𝐢𝐨𝐧\`* : 3.0.0\n*└────────────────────┘*\n\n_🫟 𝐑ɪᴋᴀ-xᴍx ᴍɪɴɪ ᴠ3 ɪs ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴜsᴇ!_`;
                         await sock.sendMessage(jid, { image: { url: "https://i.ibb.co/ycY7Nyg6/4f7c2504e62e.jpg" }, caption: activeText });
                         global.isBotActiveSent = true;
                     } catch (e) {}
@@ -490,7 +490,7 @@ const sock = makeWASocket({
                 }
                 if (sessionConfig.AUTO_BIO === 'true' || sessionConfig.AUTO_BIO === true) {
                     let currentUptime = typeof runtime !== 'undefined' ? runtime(process.uptime()) : process.uptime();
-                    await sock.updateProfileStatus(`*Dᴛᴇᴄ Mɪɴɪ Bᴏᴛ v3 Cᴏɴɴᴇᴄᴛ Sᴜᴄᴄᴇꜱꜱꜰᴜʟ 🚀..."* *${currentUptime}* `).catch(() => {});
+                    await sock.updateProfileStatus(`*Ｒɪᴋᴀ xᴍᴅ Bᴏᴛ v3 Cᴏɴɴᴇᴄᴛ Sᴜᴄᴄᴇꜱꜱꜰᴜʟ 🚀..."* *${currentUptime}* `).catch(() => {});
                 }
                 if (sessionConfig.READ_CMD_ONLY === "true" || sessionConfig.READ_CMD_ONLY === true) {
                     if (isCmd) await sock.readMessages([msg.key]).catch(() => {});
