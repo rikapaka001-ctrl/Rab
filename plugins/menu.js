@@ -1,12 +1,10 @@
-const { cmd, commands } = require('../command');
+const { cmd, commands, proto } = require('../command'); // proto add kale
 const os = require('os');
 const moment = require('moment-timezone');
 
 const botLogo = "https://i.ibb.co/ycY7Nyg6/4f7c2504e62e.jpg";
 const ownername = "sʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ";
 const botname = "𝐑ɪᴋᴀ ᴍɪɴɪ ʙᴏᴛ-ᴍᴇɴᴜ";
-
-const logoTypes = ["neon","neon2","fire2","glitch","hacker","futuristic","thunder","devil","fire","ice","snow","lava","metal","gold","silver","glossy","blackpink","transformer","horror","blood","joker","galaxy","space","cloud","sand","stone","magma","gradient","light","paper","watercolor","candy","christmas","luxury","leaf","summer","circuit","block3d","cartoon","chrome","frozen"];
 
 cmd({
     pattern: "menu",
@@ -53,55 +51,66 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
 
 > _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ 1-8 ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._`;
 
-        await conn.sendMessage(from, {
-            image: { url: botLogo },
-            caption: menuText,
-            footer: "© 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗",
-            contextInfo: {
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363428073031350@newsletter",
-                    newsletterName: "Ｒɪᴋᴀ ᴛᴇᴀᴄʜ ᴏꜰᴄ 🐉"
+        // 1. Image eka upload karapan
+        const { imageMessage } = await conn.uploadMediaMessage('image', { url: botLogo }, { upload: conn.waUploadToServer });
+
+        // 2. v7 Interactive Message Hadamu
+        const msg = proto.Message.fromObject({
+            viewOnceMessage: {
+                message: {
+                    interactiveMessage: {
+                        header: proto.Message.InteractiveMessage.Header.fromObject({
+                            hasMediaAttachment: true,
+                            imageMessage: imageMessage
+                        }),
+                        body: proto.Message.InteractiveMessage.Body.fromObject({
+                            text: menuText
+                        }),
+                        footer: proto.Message.InteractiveMessage.Footer.fromObject({
+                            text: "© 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗"
+                        }),
+                        nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+                            buttons: [
+                                {
+                                    name: "single_select",
+                                    buttonParamsJson: JSON.stringify({
+                                        title: "📜 Click Menu",
+                                        sections: [{
+                                            title: "Main Panels",
+                                            rows: [
+                                                { id: "1", title: "Main Menu", description: "Core Commands" },
+                                                { id: "2", title: "Owner Menu", description: "Admin Only" },
+                                                { id: "3", title: "Group Menu", description: "Group Tools" },
+                                                { id: "4", title: "Logo Menu", description: "40+ Styles" },
+                                            ]
+                                        },{
+                                            title: "More Panels",
+                                            rows: [
+                                                { id: "5", title: "Downloads", description: "YT, FB, Tik" },
+                                                { id: "6", title: "Search Menu", description: "Google, Git" },
+                                                { id: "7", title: "AI Features", description: "GPT, Imagine" },
+                                                { id: "8", title: "Other Tools", description: "Stalk, Calc" },
+                                            ]
+                                        }]
+                                    })
+                                },
+                                {
+                                    name: "cta_url",
+                                    buttonParamsJson: JSON.stringify({
+                                        display_text: "📦 GITHUB REPO",
+                                        url: "https://github.com/ShamikaDenuwan/V",
+                                        merchant_url: "https://github.com/ShamikaDenuwan/V"
+                                    })
+                                }
+                            ],
+                            messageParamsJson: ""
+                        })
+                    }
                 }
-            },
-            interactiveButtons: [
-                {
-                    name: "single_select",
-                    buttonParamsJson: JSON.stringify({
-                        title: "📜 Click Menu",
-                        sections: [
-                            {
-                                title: "Main Panels",
-                                rows: [
-                                    { header: "Panel 1", title: "Main Menu", id: "1", description: "Core Commands" },
-                                    { header: "Panel 2", title: "Owner Menu", id: "2", description: "Admin Only" },
-                                    { header: "Panel 3", title: "Group Menu", id: "3", description: "Group Tools" },
-                                    { header: "Panel 4", title: "Logo Menu", id: "4", description: "40+ Styles" },
-                                ]
-                            },
-                            {
-                                title: "More Panels",
-                                rows: [
-                                    { header: "Panel 5", title: "Downloads", id: "5", description: "YT, FB, Tik" },
-                                    { header: "Panel 6", title: "Search Menu", id: "6", description: "Google, Git" },
-                                    { header: "Panel 7", title: "AI Features", id: "7", description: "GPT, Imagine" },
-                                    { header: "Panel 8", title: "Other Tools", id: "8", description: "Stalk, Calc" },
-                                ]
-                            }
-                        ]
-                    })
-                },
-                {
-                    name: "cta_url",
-                    buttonParamsJson: JSON.stringify({
-                        display_text: "📦 GITHUB REPO",
-                        url: "https://github.com/ShamikaDenuwan/V",
-                        merchant_url: "https://github.com/ShamikaDenuwan/V"
-                    })
-                }
-            ]
-        }, { quoted: mek });
+            }
+        });
+
+        await conn.relayMessage(from, msg.message, { messageId: mek.key.id });
 
     } catch (e) {
         console.log(e);
@@ -109,73 +118,15 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
     }
 });
 
-const generateSubMenu = async (conn, from, category, title, pushname) => {
-    try {
-        let cmdList = '';
-        commands.filter(c => c.category === category &&!c.dontAddCommandList).forEach(c => {
-            cmdList += `│ ⊳ *${c.pattern}*\n│ ${c.desc || 'No Description'}\n│\n`;
-        });
-        if (cmdList === '') cmdList = `│ ⊳ 𝐍ᴏ ᴄᴏᴍᴀɴᴅs ғᴏᴜɴᴅ.\n│\n`;
-
-        let menuContent = `╭─── « 𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ3 » ───⟡
-│
-│ ⊳ *${title}*
-│
-${cmdList}╰───────────────⟡
-
-> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
-
-        await conn.sendMessage(from, { image: { url: botLogo }, caption: menuContent });
-    } catch (e) {
-        console.log(e);
-    }
-};
-
-cmd({ pattern: "logomenu", dontAddCommandList: true, filename: __filename },
-async(conn, mek, m, {from, pushname, reply}) => {
-    let logoList = `╭─── « 𝐋ᴏɢᴏ ᴍᴀᴋᴇʀ ᴍᴇɴᴜ » ───⟡
-│
-`;
-    logoTypes.forEach((type, index) => {
-        let num = (index + 1).toString().padStart(2, '0');
-        logoList += `│ [ ${num} ] ${type.toUpperCase()}\n`;
-    });
-    logoList += `│
-╰───────────────⟡
-
-> _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɢᴇɴᴇʀᴀᴛᴇ._
-> _Ex:.logo 01 Crezy Rika_
-
-> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
-
-    await conn.sendMessage(from, { image: { url: botLogo }, caption: logoList });
-});
-
+// Oya thiyena submenu commands okkoma mehema thiyaganna
 cmd({ pattern: "mainmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, from, 'main', '𝐌ᴀɪɴ ᴄᴏᴍᴀɴᴅs', pushname);
+    let cmdList = commands.filter(c => c.category === 'main' &&!c.dontAddCommandList).map(c => `│ ⊳ *${c.pattern}*\n│ ${c.desc || 'No Description'}\n│\n`).join('');
+    await conn.sendMessage(from, { image: { url: botLogo }, caption: `╭─── « 𝐌ᴀɪɴ ᴄᴏᴍᴀɴᴅs » ───⟡\n│\n${cmdList || '│ ⊳ 𝐍ᴏ ᴄᴏᴍᴀɴᴅs ғᴏᴜɴᴅ.\n│\n'}╰───────────────⟡` });
 });
 cmd({ pattern: "ownermenu", react: "⚡", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, from, 'owner', '𝐎ᴡɴᴇʀ ᴄᴏᴍᴀɴᴅs', pushname);
+    let cmdList = commands.filter(c => c.category === 'owner' &&!c.dontAddCommandList).map(c => `│ ⊳ *${c.pattern}*\n│ ${c.desc || 'No Description'}\n│\n`).join('');
+    await conn.sendMessage(from, { image: { url: botLogo }, caption: `╭─── « 𝐎ᴡɴᴇʀ ᴄᴏᴍᴀɴᴅs » ───⟡\n│\n${cmdList || '│ ⊳ 𝐍ᴏ ᴄᴏᴍᴀɴᴅs ғᴏᴜɴᴅ.\n│\n'}╰───────────────⟡` });
 });
-cmd({ pattern: "groupmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
-async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, from, 'group', '𝐆ʀᴏᴜᴘ ᴄᴏᴍᴀɴᴅs', pushname);
-});
-cmd({ pattern: "downloadmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
-async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, from, 'download', '𝐃ᴏᴡɴʟᴏᴀᴅᴇʀs', pushname);
-});
-cmd({ pattern: "searchmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
-async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, from, 'search', '𝐒ᴇᴀʀᴄʜ ᴛᴏʟs', pushname);
-});
-cmd({ pattern: "aimenu", react: "⚡", dontAddCommandList: true, filename: __filename },
-async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, from, 'ai', '𝐀ɪ ғᴇᴀᴛᴜʀᴇs', pushname);
-});
-cmd({ pattern: "othermenu", react: "⚡", dontAddCommandList: true, filename: __filename },
-async(conn, mek, m, {from, pushname, reply}) => {
-    await generateSubMenu(conn, from, 'other', '𝐎ᴛʜᴇʀ ᴜᴛɪʟɪᴛɪᴇs', pushname);
-});
+// groupmenu, downloadmenu, searchmenu, aimenu, othermenu okkoma ehemai
