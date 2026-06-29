@@ -1,4 +1,5 @@
 const { cmd, commands } = require('../command');
+const config = require('../config');
 const os = require('os');
 const moment = require('moment-timezone');
 
@@ -39,9 +40,9 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
 
         const menuText = `╭───( Ｒɪᴋᴀ xᴍᴅ ᴠ3 🎀 )
 │
-||友 Developer ‹ *${ownername}*
+||友 Developer ‹ *Ｓʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ*
 ||友 Version ‹ *3.0.0*
-||友 Mode ‹ *Public*
+||友 Mode ‹ *${config.WORK_TYPE}*
 ||友 RAM ‹ *${ramUsage}*
 ||友 Uptime ‹ *${rtime}*
 ||友 User ‹ *${pushname}* 🐉
