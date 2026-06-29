@@ -1,4 +1,5 @@
-const { cmd, commands, proto, generateWAMessageFromContent } = require('../command'); // proto add kale
+const { cmd, commands } = require('../command');
+const { proto, generateWAMessageFromContent } = require('@whiskeysockets/baileys'); // Baileys ekenma gatta
 const os = require('os');
 const moment = require('moment-timezone');
 
@@ -31,13 +32,13 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
         const time = moment.tz('Asia/Colombo').format('HH');
         let greeting = time >= 4 && time < 12? "Good Morning 🙈" : time >= 12 && time < 17? "Good Afternoon 🙉" : time >= 17 && time < 20? "Good Evening 🙊" : "Good Night";
 
-        // 1. OCHO Box Style Text
+        // OCHO Box Style Text
         const menuText = `╭───( ${botname.toUpperCase()} )
 │
 ||友 Developer ‹ *${ownername}*
 ||友 Version ‹ *3.0.0*
 ||友 Mode ‹ *Public*
-||友 Stats ‹ *Vip*
+||友 RAM ‹ *${ramUsage}*
 ||友 Uptime ‹ *${rtime}*
 ||友 User ‹ *${pushname}* 🐉
 ╰──────────────────●
@@ -57,27 +58,28 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
 │
 ┗━┫ *🐲𝐑ɪᴋᴀ 𝐗ᴍᴅ ᴍɪɴɪ ʙᴏᴛ-ᴍᴇɴᴜ📃* ⌋┅×
 
-_𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._`;
+_𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ 1-8 ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._`;
 
-        // 2. v7 Product Message = OCHO Card
-        const productMsg = await generateWAMessageFromContent(from, proto.Message.fromObject({
+        // v7 Product Message = OCHO Card
+        const productContent = proto.Message.fromObject({
             productMessage: {
                 product: {
                     productImage: { url: botLogo },
                     productImageCount: 1,
-                    title: "𝐑ɪᴋᴀ ᴍɪɴɪ ᴠ3.0", // OCHO FLOODS V3.0 wage
-                    description: "Ends on Dec 31\nCode: RIKA-MINI", // Me tika wenas karapan
+                    title: "𝐑ɪᴋᴀ ᴍɪɴɪ ᴠ3.0", 
+                    description: "Ends on Dec 31\nCode: RIKA-MINI",
                     currencyCode: "LKR",
-                    priceAmount1000: "0", // Free
-                    retailerId: "RIKA",
-                    productId: "rika-mini-v3"
+                    priceAmount1000: "0", 
+                    retailerId: "RIKA"
                 },
                 businessOwnerJid: conn.user.id.split(':')[0] + '@s.whatsapp.net'
             }
-        }), { userJid: from, quoted: mek });
+        });
 
-        // 3. Product Card eka + Caption eka yawanna
-        await conn.relayMessage(from, productMsg.message, { messageId: productMsg.key.id });
+        const msg = await generateWAMessageFromContent(from, productContent, { userJid: from });
+        await conn.relayMessage(from, msg.message, { messageId: msg.key.id });
+        
+        // Caption eka yawanna
         await conn.sendMessage(from, {
             text: menuText,
             contextInfo: {
@@ -85,14 +87,14 @@ _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._`;
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: "120363428073031350@newsletter",
-                    newsletterName: "Ｒɪᴋᴀ ᴛᴇᴀᴄʜ ᴏꜰᴄ 🐉" // Meta AI wage
+                    newsletterName: "Ｒɪᴋᴀ ᴛᴇᴀᴄʜ ᴏꜰᴄ 🐉"
                 }
             }
         }, { quoted: mek });
 
         // Number Reply System
         global.numberStore = global.numberStore || {};
-        global.numberStore[productMsg.key.id] = {
+        global.numberStore[msg.key.id] = {
             "1": "mainmenu", "2": "ownermenu", "3": "groupmenu", "4": "logomenu",
             "5": "downloadmenu", "6": "searchmenu", "7": "aimenu", "8": "othermenu"
         };
@@ -108,7 +110,7 @@ const generateSubMenu = async (conn, from, category, title) => {
     await conn.sendMessage(from, { image: { url: botLogo }, caption: `╭─── « ${title} » ───⟡\n│\n${cmdList || '│ ⊳ 𝐍ᴏ ᴄᴏᴍᴀɴᴅs ғᴏᴜɴᴅ.\n│\n'}╰───────────────⟡\n\n> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ${ownername} ❗` });
 };
 
-cmd({ pattern: "logomenu", dontAddCommandList: true }, async(conn, m, {from, pushname}) => {
+cmd({ pattern: "logomenu", dontAddCommandList: true }, async(conn, m, {from}) => {
     let logoList = `╭─── « 𝐋ᴏɢᴏ ᴍᴀᴋᴇʀ ᴍᴇɴᴜ » ───⟡\n│\n`;
     logoTypes.forEach((type, index) => logoList += `│ [ ${(index+1).toString().padStart(2, '0')} ] ${type.toUpperCase()}\n`);
     logoList += `│\n╰───────────────⟡\n\n> _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɢᴇɴᴇʀᴀᴛᴇ._\n> _Ex:.logo 01 Crezy Rika_\n\n> © 𝐏ᴏᴡᴇʀᴅ ʙʏ ${ownername} ❗`;
