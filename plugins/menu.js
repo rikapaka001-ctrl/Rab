@@ -13,7 +13,7 @@ cmd({
     alias: ["panel", "list", "commands"],
     desc: "Show main menu.",
     category: "main",
-    react: "📁",
+    react: "⚡",
     filename: __filename
 },
 async (conn, mek, m, { from, pushname, prefix, reply }) => {
@@ -50,9 +50,8 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
 ╰────────────────❒
 
 \`⌥ ᴛʜᴇ ʙᴇꜱᴛ ᴡʜᴀᴛꜱᴀᴘ ʙᴏᴛ 🎀ᯓ\`
-\`⌥ ᴘᴏᴡᴇʀᴅ ʙʏ ʀɪᴋᴀ ᴛᴇᴀᴄʜ 🎀ᯓ\`
 
-> _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴏʀ ᴜsᴇ ᴛʜᴇ ʙᴜᴛᴏɴs ʙᴇʟᴏᴡ._`;
+> _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ 1-8 ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ._`;
 
         await conn.sendMessage(from, {
             image: { url: botLogo },
@@ -70,7 +69,7 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
                 {
                     name: "single_select",
                     buttonParamsJson: JSON.stringify({
-                        title: "📜 Click Menu", // OCHO style
+                        title: "📜 Click Menu",
                         sections: [
                             {
                                 title: "Main Panels",
@@ -96,7 +95,7 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
                 {
                     name: "cta_url",
                     buttonParamsJson: JSON.stringify({
-                        display_text: "📦 GITHUB REPO", // OCHO style
+                        display_text: "📦 GITHUB REPO",
                         url: "https://github.com/ShamikaDenuwan/V",
                         merchant_url: "https://github.com/ShamikaDenuwan/V"
                     })
@@ -110,48 +109,11 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
     }
 });
 
-// Reply with number -> Submenu eka enna
-conn.ev.on('messages.upsert', async (msgUpdate) => {
-    try {
-        const msg = msgUpdate.messages[0];
-        if (!msg.message ||!msg.message.extendedTextMessage) return;
-
-        const selectedId = msg.message.extendedTextMessage.contextInfo?.quotedMessage?.interactiveResponseMessage?.nativeFlowResponseMessage?.paramsJson;
-        let number = msg.message.conversation || msg.message.extendedTextMessage.text;
-
-        if(selectedId){
-            const json = JSON.parse(selectedId);
-            number = json.id;
-        }
-
-        if (!["1","2","3","4","5","6","7","8"].includes(number)) return;
-
-        const from = msg.key.remoteJid;
-        const pushname = msg.pushName;
-
-        const menus = {
-            "1": ["main", "𝐌ᴀɪɴ ᴄᴏᴍᴀɴᴅs"],
-            "2": ["owner", "𝐎ᴡɴᴇʀ ᴄᴏᴍᴀɴᴅs"],
-            "3": ["group", "𝐆ʀᴏᴜᴘ ᴄᴏᴍᴀɴᴅs"],
-            "4": ["logo", "𝐋ᴏɢᴏ ᴍᴇɴᴜ"],
-            "5": ["download", "𝐃ᴏᴡɴʟᴏᴀᴅᴇʀs"],
-            "6": ["search", "𝐒ᴇᴀʀᴄʜ ᴛᴏʟs"],
-            "7": ["ai", "𝐀ɪ ғᴇᴀᴛᴜʀᴇs"],
-            "8": ["other", "𝐎ᴛʜᴇʀ ᴜᴛɪʟɪᴛɪᴇs"]
-        };
-
-        if(number === "4") return await logoMenu(conn, from, pushname);
-        const [cat, title] = menus[number];
-        await generateSubMenu(conn, from, cat, title, pushname);
-
-    } catch (e) { console.log(e) }
-})
-
 const generateSubMenu = async (conn, from, category, title, pushname) => {
     try {
         let cmdList = '';
         commands.filter(c => c.category === category &&!c.dontAddCommandList).forEach(c => {
-            cmdList += `│ ⊳ *${prefix}${c.pattern}*\n│ ${c.desc || 'No Description'}\n│\n`;
+            cmdList += `│ ⊳ *${c.pattern}*\n│ ${c.desc || 'No Description'}\n│\n`;
         });
         if (cmdList === '') cmdList = `│ ⊳ 𝐍ᴏ ᴄᴏᴍᴀɴᴅs ғᴏᴜɴᴅ.\n│\n`;
 
@@ -169,7 +131,8 @@ ${cmdList}╰───────────────⟡
     }
 };
 
-const logoMenu = async(conn, from, pushname) => {
+cmd({ pattern: "logomenu", dontAddCommandList: true, filename: __filename },
+async(conn, mek, m, {from, pushname, reply}) => {
     let logoList = `╭─── « 𝐋ᴏɢᴏ ᴍᴀᴋᴇʀ ᴍᴇɴᴜ » ───⟡
 │
 `;
@@ -186,4 +149,33 @@ const logoMenu = async(conn, from, pushname) => {
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
     await conn.sendMessage(from, { image: { url: botLogo }, caption: logoList });
-};
+});
+
+cmd({ pattern: "mainmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
+async(conn, mek, m, {from, pushname, reply}) => {
+    await generateSubMenu(conn, from, 'main', '𝐌ᴀɪɴ ᴄᴏᴍᴀɴᴅs', pushname);
+});
+cmd({ pattern: "ownermenu", react: "⚡", dontAddCommandList: true, filename: __filename },
+async(conn, mek, m, {from, pushname, reply}) => {
+    await generateSubMenu(conn, from, 'owner', '𝐎ᴡɴᴇʀ ᴄᴏᴍᴀɴᴅs', pushname);
+});
+cmd({ pattern: "groupmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
+async(conn, mek, m, {from, pushname, reply}) => {
+    await generateSubMenu(conn, from, 'group', '𝐆ʀᴏᴜᴘ ᴄᴏᴍᴀɴᴅs', pushname);
+});
+cmd({ pattern: "downloadmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
+async(conn, mek, m, {from, pushname, reply}) => {
+    await generateSubMenu(conn, from, 'download', '𝐃ᴏᴡɴʟᴏᴀᴅᴇʀs', pushname);
+});
+cmd({ pattern: "searchmenu", react: "⚡", dontAddCommandList: true, filename: __filename },
+async(conn, mek, m, {from, pushname, reply}) => {
+    await generateSubMenu(conn, from, 'search', '𝐒ᴇᴀʀᴄʜ ᴛᴏʟs', pushname);
+});
+cmd({ pattern: "aimenu", react: "⚡", dontAddCommandList: true, filename: __filename },
+async(conn, mek, m, {from, pushname, reply}) => {
+    await generateSubMenu(conn, from, 'ai', '𝐀ɪ ғᴇᴀᴛᴜʀᴇs', pushname);
+});
+cmd({ pattern: "othermenu", react: "⚡", dontAddCommandList: true, filename: __filename },
+async(conn, mek, m, {from, pushname, reply}) => {
+    await generateSubMenu(conn, from, 'other', '𝐎ᴛʜᴇʀ ᴜᴛɪʟɪᴛɪᴇs', pushname);
+});
