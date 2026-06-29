@@ -1,59 +1,22 @@
 const { cmd } = require('../command');
 
 cmd({
-    pattern: "delay",
-    alias: ["lag"],
-    desc: "Send delay spam",
-    category: "other",
-    react: "🐢",
+    pattern: "rika-crash",
+    desc: "Safe spam to yourself only. Owner only.",
+    category: "owner",
+    react: "💬",
     filename: __filename
 },
-async (conn, m, { from }) => {
-    // 50x spam karala phone lag karanawa
-    for(let i = 0; i < 50; i++) {
-        await conn.sendMessage(from, { text: 'ㅤ' });
-    }
-});
+async (conn, m, { from, args, isCreator }) => {
+    if(!isCreator) return m.reply('❌ Owner only command pako');
 
-cmd({
-    pattern: "crash",
-    alias: ["crashbug"],
-    desc: "Send crash spam",
-    category: "other",
-    react: "💣",
-    filename: __filename
-},
-async (conn, m, { from }) => {
-    // 100x big text spam
-    for(let i = 0; i < 100; i++) {
-        await conn.sendMessage(from, { text: '𝐑𝐈𝐊𝐀-𝐂𝐑𝐀𝐒𝐇 '.repeat(100) });
-    }
-});
+    let text = args.join(' ') || 'RIKA-TEST';
+    let count = parseInt(args[0]) || 10;
+    if(count > 20) count = 20; // Limit 20 ta. 125 na.
 
-cmd({
-    pattern: "ghost",
-    alias: ["ghostbug"],
-    desc: "Send ghost spam",
-    category: "other",
-    react: "👻",
-    filename: __filename
-},
-async (conn, m, { from }) => {
-    for(let i = 0; i < 30; i++) {
-        await conn.sendMessage(from, { text: 'ㅤ' });
+    for (let i = 0; i < count; i++) {
+      await conn.sendMessage(from, { text: `${i+1}. ${text}` });
+      await new Promise(r => setTimeout(r, 1500)); // 1.5s delay = ban na
     }
-});
-
-cmd({
-    pattern: "invisible",
-    alias: ["invisiblebug", "blank"],
-    desc: "Send invisible spam",
-    category: "other",
-    react: "🫥",
-    filename: __filename
-},
-async (conn, m, { from }) => {
-    for(let i = 0; i < 100; i++) {
-        await conn.sendMessage(from, { text: '\u200B' });
-    }
+    m.reply(`✅ Done ${count}x`)
 });
