@@ -9,10 +9,10 @@ const logoTypes = ["neon","neon2","fire2","glitch","hacker","futuristic","thunde
 
 cmd({
     pattern: "menu",
-    alias: ["panel", "list", "commands"],
+    alias: ["panel", "rikalist", "commands"],
     desc: "Show main menu.",
     category: "main",
-    react: "⚡",
+    react: "📁",
     filename: __filename
 },
 async (conn, mek, m, { from, pushname, prefix, reply }) => {
