@@ -38,52 +38,76 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
         else if (time >= 12 && time < 17) greeting = "Good Afternoon 🙉";
         else if (time >= 17 && time < 20) greeting = "Good Evening 🙊";
 
-        // === META AI STYLE HEADER ===
-        const menuText = `
-╭─❏─ׄ─ׄ─❍─ׄ─ׄ─❍─ׄ─ׄ─❏─╮
-│ 𝘿𝙏𝙕 𝙈𝙄𝙉𝙄 𝘽𝙊𝙏 𝙑3.0 ✦
-│ 𝙋𝙤𝙬𝙚𝙧𝙚𝙙 𝘽𝙮 𝙎𝙝𝙖𝙢𝙞𝙠𝙖 🐉
-╰─❏─ׄ─ׄ─❍─ׄ─ׄ─❍─ׄ─ׄ─❏─╯
+        const menuText = `╭───( Ｒɪᴋᴀ xᴍᴅ ᴠ3 🎀 )
+│${greeting}
+||友 Developer ‹ *Ｓʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ*
+||友 Version ‹ *3.0.0*
+||友 Mode ‹ *${config.WORK_TYPE}*
+||友 RAM ‹ *${ramUsage}*
+||友 Uptime ‹ *${rtime}*
+||友 User ‹ *${pushname}* 🐉
+╰──────────────────●
 
-┌─「 𝙎𝙏𝘼𝙏𝙐𝙎 」─
-│ 👋 𝙐𝙨𝙚𝙧: ${pushname}
-│ 🌤️ ${greeting}
-│ 👑 𝘿𝙚𝙫: Ｓʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ
-│ ⚙️ 𝙈𝙤𝙙𝙚: ${config.WORK_TYPE}
-│ 📊 𝙍𝘼𝙈: ${ramUsage}
-│ ⏱️ 𝙐𝙥𝙩𝙞𝙢𝙚: ${rtime}
-│ 🖥️ 𝙃𝙤𝙨𝙩: ${hostname}
-└─────────────────────────
+\`⌥ ᴛʜᴇ ʙᴇꜱᴛ ᴡʜᴀᴛꜱᴀᴘ ʙᴏᴛ 🎀ᯓ\`
+\`⌥ ᴘᴏᴡᴇʀᴅ ʙʏ ʀɪᴋᴀ ᴛᴇᴀᴄʜ 🎀ᯓ\`
 
-> ⌥ 𝙏𝙝𝙚 𝘽𝙚𝙨𝙩 𝙒𝙝𝙖𝙩𝙨𝘼𝙥 𝘽𝙤𝙩 🎀ᯓ
-
-╭─「 𝘾𝙊𝙈𝘼𝙉𝘿 𝙋𝘼𝙉𝙀𝙇 」─╮
+╭─── « \`𝐂ᴏᴍᴀɴᴅ ᴘᴀɴᴇʟ\` » ───⟡
 │
-│ ❶ 𝙈𝙖𝙞𝙣 𝙈𝙚𝙣𝙪 😻
-│ ❷ 𝙊𝙬𝙣𝙚𝙧 𝙈𝙚𝙣𝙪 👑
-│ ❸ 𝙂𝙧𝙤𝙪𝙥 𝙈𝙚𝙣𝙪 👻
-│ ❹ 𝙇𝙤𝙜𝙤 𝙈𝙚𝙣𝙪 🧚‍♂️
-│ ❺ 𝘿𝙤𝙬𝙣𝙡𝙤𝙖𝙙𝙨 🙊
-│ ❻ 𝙎𝙚𝙖𝙧𝙘𝙝 𝙈𝙚𝙣𝙪 💗
-│ ❼ 𝘼𝙄 𝙁𝙚𝙖𝙩𝙪𝙧𝙚𝙨 💋
-│ ❽ 𝙊𝙩𝙝𝙚𝙧 𝙏𝙤𝙡𝙨 💕
+│ [ 𝟭 ] 𝐌ᴀɪɴ ᴍᴇɴᴜ 😻
+│ [ 𝟮 ] 𝐎ᴡɴᴇʀ ᴍᴇɴᴜ 👑
+│ [ 𝟯 ] 𝐆ʀᴏᴜᴘ ᴍᴇɴᴜ 👻
+│ [ 𝟰 ] 𝐋ᴏɢᴏ ᴍᴇɴᴜ 🧚‍♂️
+│ [ 𝟱 ] 𝐃ᴏᴡɴʟᴏᴀᴅs 🙊
+│ [ 𝟲 ] 𝐒ᴇᴀʀᴄʜ ᴍᴇɴᴜ 💗
+│ [ 𝟳 ] 𝐀ɪ ғᴇᴀᴛᴜʀᴇs 💋
+│ [ 𝟴 ] 𝐎ᴛʜᴇʀ ᴛᴏʟs 💕
 │
-╰─❏ 𝙍𝙚𝙥𝙡𝙮 1-8 ❏─╯
-`;
+┗━┫ *🐲𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ.* ⌋┅×`;
 
-        // === SCREENSHOT EKE WAGE 100% === BUTTON ARAYA
+        // ALIVE WAGE HARIYATA FIX KALE ✅
         const sentMsg = await conn.sendMessage(from, {
             image: { url: botLogo },
             caption: menuText,
-            contextInfo: { // MEKEN THAMAI 999 ENNE ✅
-                forwardingScore: 999, // 999 items
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: "120363428073031350@newsletter",
-                    newsletterName: "DTZ MINI BOT V 3.0" // Oya oni name eka
+            footer: "> ＰᴏᴡᴇʀᴇᴅＢʏ ＳʜᴀᴍɪᴋᴀＤᴇɴᴜᴡᴀɴ 🐉", // 1. Footer add kale
+            buttons: [ // 2. Button 2 add kale
+                {
+                    buttonId: ".ping",
+                    buttonText: { displayText: "🏓 Ping" },
+                    type: 1
+                },
+                {
+                    buttonId: ".alive",
+                    buttonText: { displayText: "🤖 Alive" },
+                    type: 1
                 }
-            }
-        }, { quoted: mek });
+            ],
+            headerType: 4, // 3. Image nisa 4
+            contextInfo: {
+    mentionedJid: [m.sender],
+
+    forwardingScore: 999,
+    isForwarded: true,
+
+    businessMessageForwardInfo: {
+        businessOwnerJid: conn.user.id
+    },
+
+    forwardedNewsletterMessageInfo: {
+        newsletterJid: "120363428073031350@newsletter",
+        newsletterName: "Ｒɪᴋᴀ ᴛᴇᴀᴄʜ ᴏꜰᴄ 🐉",
+        serverMessageId: 1
+    },
+
+    externalAdReply: {
+        title: "WhatsApp Business",
+        body: "Status",
+        thumbnailUrl: botLogo,
+        mediaType: 1,
+        renderLargerThumbnail: false,
+        showAdAttribution: true
+    }
+}
+        }, { quoted: mek }); // 5. quoted: mek fix kale ✅
 
         const msgId = sentMsg.key.id;
         global.numberStore = global.numberStore || {};
@@ -108,19 +132,21 @@ const generateSubMenu = async (conn, mek, from, category, title, pushname, reply
     try {
         let cmdList = '';
         for (let i = 0; i < commands.length; i++) {
-            if (commands[i].category === category &&!commands[i].dontAddCommandList) {
-                cmdList += `│ ⊳ *${prefix}${commands[i].pattern}*\n│ ${commands[i].desc || 'No Description'}\n│\n`;
+            if (commands[i].category === category &&!commands[i].dontAddCommandList) { // Space fix kale
+                cmdList += `│ ⊳ *${commands[i].pattern}*\n│ ${commands[i].desc || 'No Description'}\n│\n`;
             }
         }
         if (cmdList === '') cmdList = `│ ⊳ 𝐍ᴏ ᴄᴏᴍᴀɴᴅs ғᴏᴜɴᴅ.\n│\n`;
 
-        let menuContent = `╭─「 ${title} 」─╮
+        let menuContent = `╭─── « 𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ3 » ───⟡
 │
-${cmdList}╰───────────────╯
+│ ⊳ *${title}*
+│
+${cmdList}╰───────────────⟡
 
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
-        await conn.sendMessage(from, { image: { url: botLogo }, caption: menuContent }, { quoted: mek }); // Footer/buttons arala
+        await conn.sendMessage(from, { image: { url: botLogo }, caption: menuContent, footer: "> ＰᴏᴡᴇʀᴇᴅＢʏ ＳʜᴀᴍɪᴋᴀＤᴇɴᴜᴡᴀɴ 🐉" }, { quoted: mek }); // Footer + quoted add kale
     } catch (e) {
         reply('*❌ 𝐒ᴜʙᴍᴇɴᴜ ᴇʀᴏʀ!!*');
         console.log(e);
@@ -130,9 +156,9 @@ ${cmdList}╰───────────────╯
 cmd({ pattern: "logomenu", dontAddCommandList: true, filename: __filename },
 async(conn, mek, m, {from, pushname, reply}) => {
     try {
-        let logoList = `╭─「 𝐋ᴏɢᴏ ᴍᴀᴋᴇʀ 」─╮
+        let logoList = `╭─── « 𝐑ɪᴋᴀ-xᴍᴅ ᴍɪɴɪ ᴠ1 » ───⟡
 │
-│ ⊳ *${logoTypes.length} 𝙎𝙩𝙮𝙡𝙚𝙨 𝘼𝙫𝙖𝙞𝙡𝙖𝙗𝙡𝙚*
+│ ⊳ *𝐋ᴏɢᴏ ᴍᴀᴋᴇʀ ᴍᴇɴᴜ*
 │
 `;
         logoTypes.forEach((type, index) => {
@@ -140,14 +166,14 @@ async(conn, mek, m, {from, pushname, reply}) => {
             logoList += `│ [ ${num} ] ${type.toUpperCase()}\n`;
         });
         logoList += `│
-╰───────────────╯
+╰───────────────⟡
 
-> _𝙍𝙚𝙥𝙡𝙮 𝙬𝙞𝙩𝙝 𝙖 𝙉𝙪𝙢𝙗𝙚𝙧_
-> _𝙀𝙭:.𝙡𝙤𝙜𝙤 01 𝙎𝙝𝙖𝙢𝙞𝙠𝙖_
+> _𝐑ᴇᴘʟʏ ᴡɪᴛʜ ᴀ ɴᴜᴍʙᴇʀ ᴛᴏ ɢᴇɴᴇʀᴀᴛᴇ._
+> _𝐓ᴏ sᴇᴛ ᴄᴜsᴛᴏᴍ ɴᴀᴍᴇ:.ʟᴏɢᴏ <ɴᴀᴍᴇ>_
 
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗`;
 
-        const sentMsg = await conn.sendMessage(from, { image: { url: botLogo }, caption: logoList }, { quoted: mek }); // Footer/buttons arala
+        const sentMsg = await conn.sendMessage(from, { image: { url: botLogo }, caption: logoList, footer: "> ＰᴏᴡᴇʀᴇᴅＢʏ ＳʜᴀᴍɪᴋᴀＤᴇɴᴜᴡᴀɴ 🐉" }, { quoted: mek }); // Footer + quoted add kale
         const msgId = sentMsg.key.id;
         global.numberStore = global.numberStore || {};
         global.numberStore[msgId] = {};
