@@ -30,7 +30,7 @@ async (conn, mek, m, { from, quoted, reply }) => {
 ╰━━━━━━━━━━━━━━⊷
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗
 `
-          }, { quoted: rikaxmd v3}); // dtzminibot wenuwata { quoted: mek } damma
+          }, { quoted: mek }); // dtzminibot wenuwata { quoted: mek } damma
 
         // React ✅
         await conn.sendMessage(from, {
