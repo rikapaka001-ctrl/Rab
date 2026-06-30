@@ -99,8 +99,8 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
     },
 
     externalAdReply: {
-        title: "𝐑𝐈𝐊𝐀 𝐗𝐌𝐃",
-        body: "ＲＩＫＡ Ｖ3 🎀",
+        title: "𝐑𝐈𝐊𝐀 𝐗𝐌𝐃 𝐕3 🎀",
+        body: "ϟ ᴘᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ 🐉",
         thumbnailUrl: botLogo,
         mediaType: 1,
         renderLargerThumbnail: false,
