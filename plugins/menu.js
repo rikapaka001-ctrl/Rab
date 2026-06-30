@@ -99,8 +99,8 @@ async (conn, mek, m, { from, pushname, prefix, reply }) => {
     },
 
     externalAdReply: {
-        title: "WhatsApp Business",
-        body: "Status",
+        title: "𝐑𝐈𝐊𝐀 𝐗𝐌𝐃",
+        body: "ＲＩＫＡ Ｖ3 🎀",
         thumbnailUrl: botLogo,
         mediaType: 1,
         renderLargerThumbnail: false,
