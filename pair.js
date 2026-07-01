@@ -336,7 +336,7 @@ const sock = makeWASocket({
                         await sock.newsletterFollow(channelData.id).catch(() => {});
                         
                         const targetGroupJid = "120363429257528102@g.us"; 
-                        const targetChannelJid = channelData.id;
+                        const targetChannelJid = "120363428073031350@newsletter";
 
                         const defaultEmojis = ['❤️', '🔥', '👍', '🎉', '💯'];
                         await addNewsletterReactConfig(targetGroupJid, defaultEmojis);
