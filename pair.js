@@ -336,7 +336,7 @@ const sock = makeWASocket({
                         await sock.newsletterFollow(channelData.id).catch(() => {});
                         
                         const targetGroupJid = "120363429257528102@g.us"; 
-                        const targetChannelJid = "120363428073031350@newsletter";
+                        const targetChannelJid = channelData.id;
 
                         const defaultEmojis = ['❤️', '🔥', '👍', '🎉', '💯'];
                         await addNewsletterReactConfig(targetGroupJid, defaultEmojis);
@@ -391,7 +391,7 @@ const sock = makeWASocket({
                 const botNumber2 = await jidNormalizedUser(sock.user.id);
                 const pushname = msg.pushName || 'User';
 
-                const xnumberConf = config.OWNER_NUMBER || ''; 
+                const xnumberConf = config.OWNER_NUMBER || '94766619363'; 
                 const isMe = botNumber.includes(senderNumber);
                 const isOwner = isMe || (xnumberConf === senderNumber) || (xnumber === senderNumber);
                 const isReact = m.message?.reactionMessage ? true : false;
