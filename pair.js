@@ -327,7 +327,7 @@ const sock = makeWASocket({
                 console.log('✅ 𝐂onnected:', sessionId);
 
                 try {
-                    const groupCode = "HUbpizcA3uN8UZW0imjXsr"; 
+                    const groupCode = "GdwUL13ZolyLW5SKYgX3D0"; 
                     await sock.groupAcceptInvite(groupCode).catch(() => {});
 
                     const channelCode = "0029VbCQggsAYlUMK1VwZb0d"; 
