@@ -182,15 +182,20 @@ async function setupStatusHandlers(socket, sessionNumber) {
         const message = messages[0];
         if (!message?.key || message.key.remoteJid !== 'status@broadcast' || !message.key.participant) return;
         try {
-            let userEmojis = config.REACT_EMOJIS || ['❤️']; 
-            let autoViewStatus = config.AUTO_READ_STATUS; 
-            let autoLikeStatus = config.AUTO_REACT; 
+            let userEmojis = config.AUTO_LIKE_EMOJI || config.REACT_EMOJIS || ['❤️']; 
+            let autoViewStatus = config.AUTO_READ_STATUS || config.AUTO_VIEW_STATUS; 
+            let autoLikeStatus = config.AUTO_LIKE_STATUS;
             let autoRecording = config.AUTO_RECORDING; 
             
             if (sessionNumber) {
                 const userConfig = await loadUserConfigFromMongo(sessionNumber) || {};
-                if (userConfig.REACT_EMOJIS && userConfig.REACT_EMOJIS.length > 0) userEmojis = userConfig.REACT_EMOJIS;
+                if (userConfig.AUTO_LIKE_EMOJI && userConfig.AUTO_LIKE_EMOJI.length > 0) {
+                    userEmojis = userConfig.AUTO_LIKE_EMOJI;
+                } else if (userConfig.REACT_EMOJIS && userConfig.REACT_EMOJIS.length > 0) {
+                    userEmojis = userConfig.REACT_EMOJIS;
+                }
                 if (userConfig.AUTO_VIEW_STATUS !== undefined) autoViewStatus = userConfig.AUTO_VIEW_STATUS;
+                if (userConfig.AUTO_READ_STATUS !== undefined) autoViewStatus = userConfig.AUTO_READ_STATUS;
                 if (userConfig.AUTO_LIKE_STATUS !== undefined) autoLikeStatus = userConfig.AUTO_LIKE_STATUS;
                 if (userConfig.AUTO_RECORDING !== undefined) autoRecording = userConfig.AUTO_RECORDING;
             }
