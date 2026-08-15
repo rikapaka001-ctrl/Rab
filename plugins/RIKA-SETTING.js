@@ -2,17 +2,44 @@ const config = require('../config');
 const { cmd } = require('../command');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
 
 const configPath = path.join(__dirname, '../config.js');
 
 // ===============================
-// SAVE CONFIG - FIXED
+// Mongo UserConfig Model (pair.js එකේ තියෙන එකට සමාන)
 // ===============================
-function saveConfig() {
+let UserConfigModel;
+try {
+    UserConfigModel = mongoose.model('UserConfig');
+} catch (e) {
+    const UserConfigSchema = new mongoose.Schema({ number: String, config: Object, updatedAt: Date });
+    UserConfigModel = mongoose.model('UserConfig', UserConfigSchema);
+}
+
+// ===============================
+// SAVE CONFIG (File + MongoDB)
+// ===============================
+async function saveConfig(conn = null) {
+    // 1. config.js එකට save
     const newConfig = `module.exports = ${JSON.stringify(config, null, 4)};`;
     fs.writeFileSync(configPath, newConfig);
     delete require.cache[require.resolve('../config')];
     Object.assign(config, require('../config'));
+
+    // 2. MongoDB එකටත් save (bot number එකෙන්)
+    try {
+        if (conn && conn.user && conn.user.id) {
+            const number = conn.user.id.split(':')[0].replace(/[^0-9]/g, '');
+            await UserConfigModel.findOneAndUpdate(
+                { number },
+                { number, config: { ...config }, updatedAt: new Date() },
+                { upsert: true }
+            );
+        }
+    } catch (e) {
+        console.error('Mongo save error:', e.message);
+    }
 }
 
 // ===============================
@@ -35,30 +62,49 @@ cmd({
     category: 'settings',
     react: '👁️'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Status:\n${config.AUTO_READ_STATUS? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.autostatusread on`);
+    if (!args[0]) return reply(`Current Status:\n${config.AUTO_READ_STATUS ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.autostatusread on`);
     const option = args[0].toLowerCase();
-    if (option === 'on') { config.AUTO_READ_STATUS = true; saveConfig(); return reply('✅ AUTO STATUS READ ENABLED'); }
-    if (option === 'off') { config.AUTO_READ_STATUS = false; saveConfig(); return reply('❌ AUTO STATUS READ DISABLED'); }
+    if (option === 'on') { config.AUTO_READ_STATUS = true; await saveConfig(conn); return reply('✅ AUTO STATUS READ ENABLED'); }
+    if (option === 'off') { config.AUTO_READ_STATUS = false; await saveConfig(conn); return reply('❌ AUTO STATUS READ DISABLED'); }
     reply('Use ON or OFF');
 });
 
 // ===============================
-// AUTO REACT
+// AUTO REACT (Messages Only)
 // ===============================
 cmd({
     pattern: 'autoreact',
-    desc: 'Turn Auto React ON/OFF',
+    desc: 'Turn Auto React (Messages) ON/OFF',
     category: 'settings',
     react: '❤️'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Status:\n${config.AUTO_REACT? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.autoreact on`);
+    if (!args[0]) return reply(`Current Status (Messages):\n${config.AUTO_REACT ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.autoreact on`);
     const option = args[0].toLowerCase();
-    if (option === 'on') { config.AUTO_REACT = true; saveConfig(); return reply('✅ AUTO REACT ENABLED'); }
-    if (option === 'off') { config.AUTO_REACT = false; saveConfig(); return reply('❌ AUTO REACT DISABLED'); }
+    if (option === 'on') { config.AUTO_REACT = true; await saveConfig(conn); return reply('✅ AUTO REACT (Messages) ENABLED'); }
+    if (option === 'off') { config.AUTO_REACT = false; await saveConfig(conn); return reply('❌ AUTO REACT (Messages) DISABLED'); }
+    reply('Use ON or OFF');
+});
+
+// ===============================
+// AUTO REACT STATUS (Status Only)
+// ===============================
+cmd({
+    pattern: 'autoreactstatus',
+    alias: ['autoreactst', 'statusreact'],
+    desc: 'Turn Auto React Status ON/OFF',
+    category: 'settings',
+    react: '💫'
+},
+async (conn, mek, m, { args, reply, senderNumber }) => {
+    if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
+    if (!args[0]) return reply(`Current Status React:\n${config.AUTO_LIKE_STATUS ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.autoreactstatus on`);
+    const option = args[0].toLowerCase();
+    if (option === 'on') { config.AUTO_LIKE_STATUS = true; await saveConfig(conn); return reply('✅ AUTO REACT STATUS ENABLED'); }
+    if (option === 'off') { config.AUTO_LIKE_STATUS = false; await saveConfig(conn); return reply('❌ AUTO REACT STATUS DISABLED'); }
     reply('Use ON or OFF');
 });
 
@@ -71,12 +117,12 @@ cmd({
     category: 'settings',
     react: '⌨️'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Status:\n${config.AUTO_TYPING? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.autotyping on`);
+    if (!args[0]) return reply(`Current Status:\n${config.AUTO_TYPING ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.autotyping on`);
     const option = args[0].toLowerCase();
-    if (option === 'on') { config.AUTO_TYPING = true; saveConfig(); return reply('✅ AUTO TYPING ENABLED'); }
-    if (option === 'off') { config.AUTO_TYPING = false; saveConfig(); return reply('❌ AUTO TYPING DISABLED'); }
+    if (option === 'on') { config.AUTO_TYPING = true; await saveConfig(conn); return reply('✅ AUTO TYPING ENABLED'); }
+    if (option === 'off') { config.AUTO_TYPING = false; await saveConfig(conn); return reply('❌ AUTO TYPING DISABLED'); }
     reply('Use ON or OFF');
 });
 
@@ -89,12 +135,12 @@ cmd({
     category: 'settings',
     react: '🎙️'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Status:\n${config.AUTO_RECORDING? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.autorecording on`);
+    if (!args[0]) return reply(`Current Status:\n${config.AUTO_RECORDING ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.autorecording on`);
     const option = args[0].toLowerCase();
-    if (option === 'on') { config.AUTO_RECORDING = true; saveConfig(); return reply('🎙️ AUTO RECORDING ENABLED'); }
-    if (option === 'off') { config.AUTO_RECORDING = false; saveConfig(); return reply('🎙️ AUTO RECORDING DISABLED'); }
+    if (option === 'on') { config.AUTO_RECORDING = true; await saveConfig(conn); return reply('🎙️ AUTO RECORDING ENABLED'); }
+    if (option === 'off') { config.AUTO_RECORDING = false; await saveConfig(conn); return reply('🎙️ AUTO RECORDING DISABLED'); }
     reply('Use ON or OFF');
 });
 
@@ -107,12 +153,12 @@ cmd({
     category: 'settings',
     react: '🔗'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Status:\n${config.ANTI_LINK? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.antilink on`);
+    if (!args[0]) return reply(`Current Status:\n${config.ANTI_LINK ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.antilink on`);
     const option = args[0].toLowerCase();
-    if (option === 'on') { config.ANTI_LINK = true; saveConfig(); return reply('✅ ANTI LINK ENABLED'); }
-    if (option === 'off') { config.ANTI_LINK = false; saveConfig(); return reply('❌ ANTI LINK DISABLED'); }
+    if (option === 'on') { config.ANTI_LINK = true; await saveConfig(conn); return reply('✅ ANTI LINK ENABLED'); }
+    if (option === 'off') { config.ANTI_LINK = false; await saveConfig(conn); return reply('❌ ANTI LINK DISABLED'); }
     reply('Use ON or OFF');
 });
 
@@ -125,12 +171,12 @@ cmd({
     category: 'settings',
     react: '💬'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Status:\n${config.ANTI_BAD? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.antibad on`);
+    if (!args[0]) return reply(`Current Status:\n${config.ANTI_BAD ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.antibad on`);
     const option = args[0].toLowerCase();
-    if (option === 'on') { config.ANTI_BAD = true; saveConfig(); return reply('✅ ANTI BAD ENABLED'); }
-    if (option === 'off') { config.ANTI_BAD = false; saveConfig(); return reply('❌ ANTI BAD DISABLED'); }
+    if (option === 'on') { config.ANTI_BAD = true; await saveConfig(conn); return reply('✅ ANTI BAD ENABLED'); }
+    if (option === 'off') { config.ANTI_BAD = false; await saveConfig(conn); return reply('❌ ANTI BAD DISABLED'); }
     reply('Use ON or OFF');
 });
 
@@ -143,12 +189,12 @@ cmd({
     category: 'settings',
     react: '🤖'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Status:\n${config.ANTI_BOT? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.antibot on`);
+    if (!args[0]) return reply(`Current Status:\n${config.ANTI_BOT ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.antibot on`);
     const option = args[0].toLowerCase();
-    if (option === 'on') { config.ANTI_BOT = true; saveConfig(); return reply('✅ ANTI BOT ENABLED'); }
-    if (option === 'off') { config.ANTI_BOT = false; saveConfig(); return reply('❌ ANTI BOT DISABLED'); }
+    if (option === 'on') { config.ANTI_BOT = true; await saveConfig(conn); return reply('✅ ANTI BOT ENABLED'); }
+    if (option === 'off') { config.ANTI_BOT = false; await saveConfig(conn); return reply('❌ ANTI BOT DISABLED'); }
     reply('Use ON or OFF');
 });
 
@@ -161,12 +207,12 @@ cmd({
     category: 'settings',
     react: '🌐'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Status:\n${config.ALWAYS_ONLINE? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.alwaysonline on`);
+    if (!args[0]) return reply(`Current Status:\n${config.ALWAYS_ONLINE ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.alwaysonline on`);
     const option = args[0].toLowerCase();
-    if (option === 'on') { config.ALWAYS_ONLINE = true; saveConfig(); return reply('✅ ALWAYS ONLINE ENABLED'); }
-    if (option === 'off') { config.ALWAYS_ONLINE = false; saveConfig(); return reply('❌ ALWAYS ONLINE DISABLED'); }
+    if (option === 'on') { config.ALWAYS_ONLINE = true; await saveConfig(conn); return reply('✅ ALWAYS ONLINE ENABLED'); }
+    if (option === 'off') { config.ALWAYS_ONLINE = false; await saveConfig(conn); return reply('❌ ALWAYS ONLINE DISABLED'); }
     reply('Use ON or OFF');
 });
 
@@ -179,12 +225,12 @@ cmd({
     category: 'settings',
     react: '🌙'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Status:\n${config.ALWAYS_OFFLINE? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.alwaysoffline on`);
+    if (!args[0]) return reply(`Current Status:\n${config.ALWAYS_OFFLINE ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.alwaysoffline on`);
     const option = args[0].toLowerCase();
-    if (option === 'on') { config.ALWAYS_OFFLINE = true; saveConfig(); return reply('✅ ALWAYS OFFLINE ENABLED'); }
-    if (option === 'off') { config.ALWAYS_OFFLINE = false; saveConfig(); return reply('❌ ALWAYS OFFLINE DISABLED'); }
+    if (option === 'on') { config.ALWAYS_OFFLINE = true; await saveConfig(conn); return reply('✅ ALWAYS OFFLINE ENABLED'); }
+    if (option === 'off') { config.ALWAYS_OFFLINE = false; await saveConfig(conn); return reply('❌ ALWAYS OFFLINE DISABLED'); }
     reply('Use ON or OFF');
 });
 
@@ -197,12 +243,12 @@ cmd({
     category: 'settings',
     react: '📖'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Status:\n${config.READ_CMD_ONLY? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.readcmdonly on`);
+    if (!args[0]) return reply(`Current Status:\n${config.READ_CMD_ONLY ? 'ON ✅' : 'OFF ❌'}\n\nExample:\n.readcmdonly on`);
     const option = args[0].toLowerCase();
-    if (option === 'on') { config.READ_CMD_ONLY = true; saveConfig(); return reply('✅ READ CMD ONLY ENABLED'); }
-    if (option === 'off') { config.READ_CMD_ONLY = false; saveConfig(); return reply('❌ READ CMD ONLY DISABLED'); }
+    if (option === 'on') { config.READ_CMD_ONLY = true; await saveConfig(conn); return reply('✅ READ CMD ONLY ENABLED'); }
+    if (option === 'off') { config.READ_CMD_ONLY = false; await saveConfig(conn); return reply('❌ READ CMD ONLY DISABLED'); }
     reply('Use ON or OFF');
 });
 
@@ -215,11 +261,11 @@ cmd({
     category: 'settings',
     react: '⚙️'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
-    if (!args[0]) return reply(`Current Prefix:\n${config.PREFIX}\n\nExample:\n.setprefix.`);
+    if (!args[0]) return reply(`Current Prefix:\n${config.PREFIX}\n\nExample:\n.setprefix .`);
     config.PREFIX = args[0];
-    saveConfig();
+    await saveConfig(conn);
     reply(`✅ PREFIX CHANGED TO ${args[0]}`);
 });
 
@@ -232,19 +278,19 @@ cmd({
     category: 'settings',
     react: '🛡️'
 },
-async(conn, mek, m, { args, reply, senderNumber }) => {
+async (conn, mek, m, { args, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
     if (!args[0]) return reply(`Current Mode:\n${config.WORK_TYPE}\n\nModes:\npublic | private | inbox | groups`);
     const mode = args[0].toLowerCase();
-    const allowed = ['public','private','inbox','groups'];
+    const allowed = ['public', 'private', 'inbox', 'groups'];
     if (!allowed.includes(mode)) return reply('❌ INVALID MODE');
     config.WORK_TYPE = mode;
-    saveConfig();
+    await saveConfig(conn);
     reply(`✅ MODE CHANGED TO ${mode}`);
 });
 
 // ===============================
-// SETTINGS VIEW - CHANNEL NEWSLETTER STYLE
+// SETTINGS VIEW
 // ===============================
 cmd({
     pattern: 'settings',
@@ -253,42 +299,42 @@ cmd({
     category: 'settings',
     react: '⚡'
 },
-async(conn, mek, m, { from, reply, senderNumber }) => {
+async (conn, mek, m, { from, reply, senderNumber }) => {
     if (!isOwner(senderNumber, conn)) return reply('❌ OWNER ONLY');
 
-    const status = (val) => val === true? 'ON ✅' : 'OFF ❌';
+    const status = (val) => val === true ? 'ON ✅' : 'OFF ❌';
 
     const settingsText = `
 ╭───〔 *⚙️ ${config.BOT_NAME} ꜱᴇᴛᴛɪɴɢꜱ* 〕───⬣
 │
 │ ◈ *Ｐʀᴇꜰɪx*: [${config.PREFIX}]
-⌥ .setprefix / . *
+⌥ .setprefix .
 │ ◈ *Ｍᴏᴅᴇ*: ${config.WORK_TYPE}
 ⌥ .mode private / public / inbox
 │ ◈ *Ｏᴡɴᴇʀ*: ${config.OWNER_NUMBER}
 │
-│ *🎙️Ａᴜᴛᴏ ʀᴇᴄᴏʀᴅɪɴɢ*: ${status(config.AUTO_RECORDING)}
+│ *🎙️ Ａᴜᴛᴏ ʀᴇᴄᴏʀᴅɪɴɢ*: ${status(config.AUTO_RECORDING)}
 ⌥ .autorecording on / off
 │ *⌨️ Ａᴜᴛᴏ ᴛʏᴘɪɴɢ*: ${status(config.AUTO_TYPING)}
-⌥ .autotyping on / of
+⌥ .autotyping on / off
 │ *👁️ Ａᴜᴛᴏ ꜱᴛᴀᴛᴜꜱ ʀᴇᴀᴅ*: ${status(config.AUTO_READ_STATUS)}
 ⌥ .autostatusread on / off
 │ *❤️ Ａᴜᴛᴏ ʀᴇᴀᴄᴛ*: ${status(config.AUTO_REACT)}
 ⌥ .autoreact on / off
+│ *💫 Ａᴜᴛᴏ ʀᴇᴀᴄᴛ sᴛᴀᴛᴜs*: ${status(config.AUTO_LIKE_STATUS)}
+⌥ .autoreactstatus on / off
 │ *🔗 Ａɴᴛɪ ʟɪɴᴋ*: ${status(config.ANTI_LINK)}
 ⌥ .antilink on / off
 │ *🤖 Ａɴᴛɪ ʙᴏᴛ*: ${status(config.ANTI_BOT)}
 ⌥ .antibot on / off
 │ *💬 Ａɴᴛɪ ʙᴀᴅ*: ${status(config.ANTI_BAD)}
-⌥ .antibot on / off
+⌥ .antibad on / off
 │ *🌐 Ａʟᴡᴀʏꜱ ᴏɴʟɪɴᴇ*: ${status(config.ALWAYS_ONLINE)}
 ⌥ .alwaysonline on / off
 │ *🌙 Ａʟᴡᴀʏꜱ ᴏꜰꜰʟɪɴᴇ*: ${status(config.ALWAYS_OFFLINE)}
 ⌥ .alwaysoffline on / off
 │ *📖 Ｒᴇᴀᴅ ᴄᴍᴅ ᴏɴʟʏ*: ${status(config.READ_CMD_ONLY)}
 ⌥ .readcmdonly on / off
-│
-│ \`💡 Toggle:.autotyping on/off\`
 │
 > © 𝐏ᴏᴡᴇʀᴅ ʙʏ ꜱʜᴀᴍɪᴋᴀ ᴅᴇɴᴜᴡᴀɴ ❗
 ╰────────────────⬣
