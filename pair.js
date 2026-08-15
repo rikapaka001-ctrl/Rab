@@ -273,6 +273,89 @@ const sock = makeWASocket({
         activeSockets[sessionId] = sock;
         setupStatusHandlers(sock, xnumber);
         setupNewsletterHandlers(sock, xnumber);
+        // ===============================
+        // MESSAGE STORE + ANTI DELETE
+        // ===============================
+        const messageStore = new Map();
+
+        sock.ev.on('messages.upsert', async ({ messages }) => {
+            for (const msg of messages) {
+                if (!msg.message || msg.key.remoteJid === 'status@broadcast') continue;
+                const key = msg.key.remoteJid + '_' + msg.key.id;
+                messageStore.set(key, msg);
+                if (messageStore.size > 1000) {
+                    const firstKey = messageStore.keys().next().value;
+                    messageStore.delete(firstKey);
+                }
+            }
+        });
+
+        sock.ev.on('messages.update', async (updates) => {
+            try {
+                for (const update of updates) {
+                    const protocol = update.update?.protocolMessage || update.update?.message?.protocolMessage;
+                    if (!protocol || protocol.type !== 0) continue;
+
+                    const deletedKey = protocol.key;
+                    if (!deletedKey) continue;
+
+                    const storeKey = deletedKey.remoteJid + '_' + deletedKey.id;
+                    const originalMsg = messageStore.get(storeKey);
+                    if (!originalMsg) continue;
+
+                    let antiDelete = config.ANTI_DELETE;
+                    let sendTo = config.DELETEMSGSENDTO || 'owner';
+
+                    const botNumber = sock.user.id.split(':')[0];
+                    const userConfig = await loadUserConfigFromMongo(botNumber) || {};
+                    if (userConfig.ANTI_DELETE !== undefined) antiDelete = userConfig.ANTI_DELETE;
+                    if (userConfig.DELETEMSGSENDTO) sendTo = userConfig.DELETEMSGSENDTO;
+
+                    if (antiDelete !== true && antiDelete !== 'true') continue;
+                    if (deletedKey.fromMe) continue;
+
+                    const from = deletedKey.remoteJid;
+                    const sender = originalMsg.key.participant || originalMsg.key.remoteJid;
+                    const senderNumber = (sender || '').split('@')[0];
+                    const isGroup = from.endsWith('@g.us');
+
+                    const type = getContentType(originalMsg.message);
+                    let contentText = '';
+
+                    if (type === 'conversation') contentText = originalMsg.message.conversation;
+                    else if (type === 'extendedTextMessage') contentText = originalMsg.message.extendedTextMessage?.text || '';
+                    else if (type === 'imageMessage') contentText = originalMsg.message.imageMessage?.caption || '[Image]';
+                    else if (type === 'videoMessage') contentText = originalMsg.message.videoMessage?.caption || '[Video]';
+                    else if (type === 'stickerMessage') contentText = '[Sticker]';
+                    else if (type === 'audioMessage') contentText = '[Audio]';
+                    else if (type === 'documentMessage') contentText = originalMsg.message.documentMessage?.fileName || '[Document]';
+                    else contentText = `[${type || 'Unknown'}]`;
+
+                    const notifyText = `*🗑️ ANTI DELETE*\n\n` +
+                        `*From:* ${isGroup ? 'Group' : 'Private'}\n` +
+                        `*Chat:* ${from}\n` +
+                        `*Sender:* @${senderNumber}\n` +
+                        `*Type:* ${type || 'text'}\n` +
+                        `*Message:* ${contentText || '[Empty]'}`;
+
+                    let targetJid;
+                    if (sendTo === 'chat') {
+                        targetJid = from;
+                    } else {
+                        targetJid = (config.OWNER_NUMBER || botNumber) + '@s.whatsapp.net';
+                    }
+
+                    await sock.sendMessage(targetJid, {
+                        text: notifyText,
+                        mentions: [sender]
+                    }).catch(() => {});
+
+                    messageStore.delete(storeKey);
+                }
+            } catch (e) {
+                console.error('Anti-Delete Error:', e.message);
+            }
+        });
         
         sock.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
             const r = await axios.head(url).catch(()=>null);
